@@ -21,6 +21,9 @@ module.exports = {
     'no-console': 0,
     'import/extensions': 0,
     'default-case': 0,
-    'no-plusplus': 0
+    'no-plusplus': 0,
+    'space-before-function-paren': 0,
+    'max-len': 0,
+    'class-methods-use-this': 0,
   },
 };

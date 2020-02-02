@@ -1,3 +1,5 @@
+import { Building } from './building.js';
+
 const can = document.getElementById('can');
 const ctx = can.getContext('2d');
 
@@ -19,6 +21,7 @@ ctx.strokeStyle = 'rgba(50, 50, 50, 0.4)';
 ctx.miterLimit = 3;
 ctx.strokeWidth = 1.5;
 
+// eslint-disable-next-line no-unused-vars
 let mainX = 0;
 setInterval(() => {
   const b = new Building();
@@ -40,10 +43,7 @@ function draw() {
 }
 draw();
 
-document.getElementById('widthSlider').addEventListener('input', sliderChange);
-document.getElementById('heightSlider').addEventListener('input', sliderChange);
-document.getElementById('widthFractionSlider').addEventListener('input', sliderChange);
-document.getElementById('heightFractionSlider').addEventListener('input', sliderChange);
+
 
 function sliderChange(e) {
   switch (e.target.id) {
@@ -54,3 +54,8 @@ function sliderChange(e) {
   }
   draw();
 }
+
+document.getElementById('widthSlider').addEventListener('input', sliderChange);
+document.getElementById('heightSlider').addEventListener('input', sliderChange);
+document.getElementById('widthFractionSlider').addEventListener('input', sliderChange);
+document.getElementById('heightFractionSlider').addEventListener('input', sliderChange);
