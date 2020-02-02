@@ -1,3 +1,9 @@
+### Captain's log, Feb 2st, 2020
+
+Time 2 organize.
+
+ss
+
 ### Captain's log, Feb 1st, 2020
 
 I probably? won't log much here, there's always the [website captain's log](https://github.com/simonsarris/site-simonsarris/blob/master/captainslog.md) instead.
