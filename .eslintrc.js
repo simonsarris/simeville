@@ -25,5 +25,6 @@ module.exports = {
     'space-before-function-paren': 0,
     'max-len': 0,
     'class-methods-use-this': 0,
+    'no-bitwise': 0,
   },
 };
