@@ -5,8 +5,7 @@ import { Town } from './town.js';
 const can = document.getElementById('can');
 const ctx = can.getContext('2d');
 
-// ctx.translate(20, 200);
-// ctx.scale(2, 2);
+
 CanvasRenderingContext2D.prototype.lineToRand = function (x, y) {
   this.lineTo(x, y);
   // const rand = 1;
@@ -22,7 +21,6 @@ CanvasRenderingContext2D.prototype.moveToRand = function (x, y) {
 // ctx.strokeStyle = 'rgba(50, 50, 50, 0.9)';
 ctx.miterLimit = 3;
 ctx.lineWidth = 1.5;
-ctx.scale(2.5, 2.5);
 
 // eslint-disable-next-line no-unused-vars
 // let mainX = 0;
