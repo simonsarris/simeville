@@ -1,4 +1,14 @@
-### Captain's log, Feb 2st, 2020
+
+### Captain's log, Feb 20th, 2020
+
+Back at it. I'm concerned that I won't be able to get a *pretty* scene out of a procedural canvas village. I'm considering switching to pixel art instead. :(
+
+Anyway starting the town class, adding containsPoint, adding click/selection functionality, that sort of thing. I know this isn't strictly necessary, but will help with debugging later. Besides, what if people want to interact with the houses eventually?
+
+ss
+
+
+### Captain's log, Feb 2nd, 2020
 
 Time 2 organize.
 

@@ -26,5 +26,6 @@ module.exports = {
     'max-len': 0,
     'class-methods-use-this': 0,
     'no-bitwise': 0,
+    'operator-linebreak': 0,
   },
 };

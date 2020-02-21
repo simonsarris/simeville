@@ -1,5 +1,6 @@
 import { random, randomInt } from './util.js';
 import { Building } from './building.js';
+import { Town } from './town.js';
 
 const can = document.getElementById('can');
 const ctx = can.getContext('2d');
@@ -69,25 +70,13 @@ let globalWidth = 70;
 let globalHeight = 25 + 32;
 let globalWidthFraction = 0.5;
 let globalHeightFraction = 0.5;
-function draw() {
-  ctx.clearRect(-500, -500, 1100, 1100);
-  const b = new Building(globalWidth, globalHeight, globalWidthFraction, globalHeightFraction);
-  const tempCan = document.createElement('canvas');
-  tempCan.width = globalWidth;
-  tempCan.height = globalHeight;
-  // const tempCtx = tempCan.getContext('2d');
-  // b.draw(null, tempCtx);
-  // ctx.imageSmoothingEnabled = false;
-  // ctx.drawImage(tempCan, 0, 0, globalWidth, globalHeight, 0, 0, globalWidth* 5, globalHeight*5);
-
-  b.draw(null, ctx);
-
-  console.log((globalWidth / globalHeight).toFixed(2), globalWidth, globalHeight, globalWidthFraction, globalHeightFraction);
+let town;
+function main() {
+  town = new Town(can);
+  town.draw();
 }
-ctx.translate(100, 100);
-draw();
 
-
+main();
 
 function sliderChange(e) {
   switch (e.target.id) {
@@ -96,10 +85,13 @@ function sliderChange(e) {
     case 'widthFractionSlider': globalWidthFraction = e.target.valueAsNumber; break;
     case 'heightFractionSlider': globalHeightFraction = e.target.valueAsNumber; break;
   }
-  draw();
+  if (town && town.selection) {
+    town.selection.updateValues(globalWidth, globalHeight, globalWidthFraction, globalHeightFraction);
+  }
 }
 
 document.getElementById('widthSlider').addEventListener('input', sliderChange);
 document.getElementById('heightSlider').addEventListener('input', sliderChange);
 document.getElementById('widthFractionSlider').addEventListener('input', sliderChange);
 document.getElementById('heightFractionSlider').addEventListener('input', sliderChange);
+

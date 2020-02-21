@@ -13,22 +13,29 @@ const WindowSizes = {
 };
 
 export class Building {
-  constructor(width, height, widthFraction, heightFraction, type) {
-    this.x = 0;
-    this.y = 0;
-    this.width = width;
-    this.height = height;
-    this.widthFraction = widthFraction;
-    this.heightFraction = heightFraction;
-    this.type = type;
+  constructor(x, y, width, height, widthFraction, heightFraction) {
+    this.x = x || 0;
+    this.y = y || 0;
+    this.width = width || 70;
+    this.height = height || 58;
+    this.widthFraction = widthFraction || 0.5;
+    this.heightFraction = heightFraction || 0.5;
+    // this.type = type;
   }
 
-  draw(town, ctx) {
-    const drawFunc = this.drawHouse; // TODO use
+  // return true if x,y is within bounds
+  containsPoint(x, y) {
+    return ((this.x <= x) && ((this.x + this.width) >= x) &&
+      (this.y <= y) && ((this.y + this.height) >= y));
+  }
+
+  draw(ctx) {
+    // const drawFunc = this.drawHouse; // TODO use
     const w = this.width;
     const h = this.height;
     const wf = this.widthFraction;
     const hf = this.heightFraction;
+    const { x, y } = this;
     // const aspectRatio = w / h;
     // divide width and height into fractions for roof and sides
     const w1 = w * wf;
@@ -36,11 +43,11 @@ export class Building {
     const h1 = h * hf;
     const h2 = h - h1;
     const rounds = 2;
-    //ctx.translate(0, 200 - h);
+    ctx.translate(x, y);
     for (let i = 0; i < rounds; i++) {
       this.drawHouse(ctx, w, h, w1, h1, w2, h2, i);
     }
-    //ctx.translate(0, -(200 - h));
+    ctx.translate(-x, -y);
   } // end draw
 
   /** Draw a single window at (x, y). Does not stroke or fill */
@@ -225,35 +232,40 @@ export class Building {
 
       ctx.beginPath();
 
-      // Right side along the rect
-      // From w1 to w
-      // From h1 to h
-      let y = h1;
+      // // Right side along the rect
+      // // From w1 to w
+      // // From h1 to h
+      // let y = h1;
       const windowSize = WindowSizes.small;
-      let numWindows = Math.floor(w2 / windowSize / 2) - 1; // Max
-      // randomize windows on half
-      if (Math.random() > 0.5) numWindows = Math.floor(Math.random() * numWindows);
-      let x = w1 + (w2 - ((numWindows * 2) - 1) * windowSize) / 2;
-      const startX = x;
-      const numRows = (Math.random() * 3) | 0;
-      for (let rows = 0; rows < numRows; rows++) {
-        for (let k = 0; k < numWindows; k++) {
-          this.drawWindow(ctx, x, y + windowSize, windowSize);
-          x += windowSize * 2;
-        }
-        y += windowSize * 4;
-        x = startX;
-        if (y + windowSize * 3 > h) break; // very lazy way to stop drawing more vertical windows
-      }
+      // let numWindows = Math.floor(w2 / windowSize / 2) - 1; // Max
+      // // randomize windows on half
+      // if (Math.random() > 0.5) numWindows = Math.floor(Math.random() * numWindows);
+      // let x = w1 + (w2 - ((numWindows * 2) - 1) * windowSize) / 2;
+      // const startX = x;
+      // const numRows = (Math.random() * 3) | 0;
+      // for (let rows = 0; rows < numRows; rows++) {
+      //   for (let k = 0; k < numWindows; k++) {
+      //     this.drawWindow(ctx, x, y + windowSize, windowSize);
+      //     x += windowSize * 2;
+      //   }
+      //   y += windowSize * 4;
+      //   x = startX;
+      //   if (y + windowSize * 3 > h) break; // very lazy way to stop drawing more vertical windows
+      // }
 
-      // Left side, along the attic and below it
-      x = 0;
-      y = h1 / 2;
+      // Left side, along the attic triangle and below it
+      // x = 0;
+      let y = h1 / 2;
       const halfWindow = windowSize / 2;
-      this.drawWindow(ctx, (w1 / 2) - halfWindow, y, windowSize);
+      const centered = (w1 / 2) - halfWindow;
+      this.drawWindow(ctx, centered, y, windowSize);
+      y += windowSize * 4;
+      // Maybe 2 more
+      this.drawWindow(ctx, centered - windowSize * 2, y, windowSize);
+      this.drawWindow(ctx, centered + windowSize * 2, y, windowSize);
 
       ctx.stroke();
-      ctx.fillStyle = 'rgba(0,0,0,0.9)';
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.fill();
     }
   }
