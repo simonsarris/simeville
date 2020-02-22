@@ -1,4 +1,14 @@
 
+### Captain's log, Feb 21st, 2020
+
+Wew lads. Just a little time to put in here but wanted to allow click-creating to go with click selecting (I can use a checkbox or whatever to toggle).
+
+Flipping looks OK for houses. Next up I need different kinds of buildings. I'm still concerned that this won't look good aesthetically, but I need to build out stuff like the positioning, animation manager, manipulation tools anyway.
+
+Imbibed the final curieux tonight. Out of beer and tea! Something's in the bureau de poste for the tea problem.
+
+ss
+
 ### Captain's log, Feb 20th, 2020
 
 Back at it. I'm concerned that I won't be able to get a *pretty* scene out of a procedural canvas village. I'm considering switching to pixel art instead. :(

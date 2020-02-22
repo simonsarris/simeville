@@ -13,13 +13,14 @@ const WindowSizes = {
 };
 
 export class Building {
-  constructor(x, y, width, height, widthFraction, heightFraction) {
+  constructor(x, y, width, height, widthFraction, heightFraction, flip) {
     this.x = x || 0;
     this.y = y || 0;
     this.width = width || 70;
     this.height = height || 58;
     this.widthFraction = widthFraction || 0.5;
     this.heightFraction = heightFraction || 0.5;
+    this.flip = flip;
     // this.type = type;
   }
 
@@ -35,7 +36,7 @@ export class Building {
     const h = this.height;
     const wf = this.widthFraction;
     const hf = this.heightFraction;
-    const { x, y } = this;
+    const { x, y, flip } = this;
     // const aspectRatio = w / h;
     // divide width and height into fractions for roof and sides
     const w1 = w * wf;
@@ -44,9 +45,11 @@ export class Building {
     const h2 = h - h1;
     const rounds = 2;
     ctx.translate(x, y);
+    if (flip) { ctx.translate(w, 0); ctx.scale(-1, 1); }
     for (let i = 0; i < rounds; i++) {
       this.drawHouse(ctx, w, h, w1, h1, w2, h2, i);
     }
+    if (flip) { ctx.scale(-1, 1); ctx.translate(-w, 0); }
     ctx.translate(-x, -y);
   } // end draw
 
