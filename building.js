@@ -12,7 +12,7 @@ const WindowSizes = {
   big: 5,
 };
 
-const BuildTime = 600;
+const BuildTime = 900;
 
 const EaseInOutCubic = function (time, start, change, duration) {
   time /= duration / 2;
@@ -49,13 +49,14 @@ export class Building {
   draw(ctx) {
     const animating = (this.creationTime !== 0);
     let value = 1;
+    let valfrac = 1;
     if (animating) {
       const elapsedTime = Date.now() - this.creationTime;
       if (elapsedTime > BuildTime) this.creationTime = 0;
       const starts = 0.001;
       const ends = 1;
       value = EaseInOutCubic(elapsedTime, starts, ends - starts, BuildTime);
-
+      valfrac = 1 / value;
     }
 
     const { x, y, flip, type } = this;
@@ -73,6 +74,7 @@ export class Building {
     ctx.translate(x, y);
     if (flip) { ctx.translate(w, 0); ctx.scale(-1, 1); }
     if (animating) {
+      ctx.translate(0, h - (h * value));
       ctx.scale(value, value);
     }
     for (let i = 0; i < rounds; i++) {
@@ -84,12 +86,11 @@ export class Building {
       }
     }
     if (animating) {
-      ctx.scale(1 / value, 1 / value);
+      ctx.scale(valfrac, valfrac);
+      ctx.translate(0, -(h - (h * value)));
     }
     if (flip) { ctx.scale(-1, 1); ctx.translate(-w, 0); }
     ctx.translate(-x, -y);
-
-
   } // end draw
 
   /** Draw a single window at (x, y). Does not stroke or fill */
