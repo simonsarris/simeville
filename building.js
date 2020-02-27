@@ -12,8 +12,17 @@ const WindowSizes = {
   big: 5,
 };
 
+const BuildTime = 600;
+
+const EaseInOutCubic = function (time, start, change, duration) {
+  time /= duration / 2;
+  if (time < 1) return change / 2 * time * time * time + start;
+  time -= 2;
+  return change / 2 * (time * time * time + 2) + start;
+};
+
 export class Building {
-  constructor(x, y, width, height, widthFraction, heightFraction, flip) {
+  constructor(x, y, width, height, widthFraction, heightFraction, type, flip) {
     this.x = x || 0;
     this.y = y || 0;
     this.width = width || 70;
@@ -21,7 +30,14 @@ export class Building {
     this.widthFraction = widthFraction || 0.5;
     this.heightFraction = heightFraction || 0.5;
     this.flip = flip;
-    // this.type = type;
+    this.type = type || 'house'; // house, tower, longtower
+    // Animation:
+    this.creationTime = 0; // Not yet
+  }
+
+  build() {
+    this.creationTime = Date.now();
+    this.finishTime = this.creationTime + BuildTime;
   }
 
   // return true if x,y is within bounds
@@ -31,12 +47,22 @@ export class Building {
   }
 
   draw(ctx) {
-    // const drawFunc = this.drawHouse; // TODO use
+    const animating = (this.creationTime !== 0);
+    let value = 1;
+    if (animating) {
+      const elapsedTime = Date.now() - this.creationTime;
+      if (elapsedTime > BuildTime) this.creationTime = 0;
+      const starts = 0.001;
+      const ends = 1;
+      value = EaseInOutCubic(elapsedTime, starts, ends - starts, BuildTime);
+
+    }
+
+    const { x, y, flip, type } = this;
     const w = this.width;
     const h = this.height;
     const wf = this.widthFraction;
     const hf = this.heightFraction;
-    const { x, y, flip } = this;
     // const aspectRatio = w / h;
     // divide width and height into fractions for roof and sides
     const w1 = w * wf;
@@ -46,11 +72,24 @@ export class Building {
     const rounds = 2;
     ctx.translate(x, y);
     if (flip) { ctx.translate(w, 0); ctx.scale(-1, 1); }
+    if (animating) {
+      ctx.scale(value, value);
+    }
     for (let i = 0; i < rounds; i++) {
-      this.drawHouse(ctx, w, h, w1, h1, w2, h2, i);
+      // gross and weird
+      switch (type) {
+        case 'house': this.drawHouse(ctx, w, h, w1, h1, w2, h2, i); break;
+        case 'tower': this.drawTower(ctx, w, h, w1, h1, w2, h2, i); break;
+        case 'longtower': this.drawLongTower(ctx, w, h, w1, h1, w2, h2, i); break;
+      }
+    }
+    if (animating) {
+      ctx.scale(1 / value, 1 / value);
     }
     if (flip) { ctx.scale(-1, 1); ctx.translate(-w, 0); }
     ctx.translate(-x, -y);
+
+
   } // end draw
 
   /** Draw a single window at (x, y). Does not stroke or fill */
