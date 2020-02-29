@@ -27,6 +27,7 @@ let town;
 function main() {
   town = new Town(can);
   town.draw();
+  window.town = town;
 }
 
 main();

@@ -1,7 +1,11 @@
+import bezier from './easing.js';
 
+const houseBez = bezier(0.00, 0.75, 0.29, 1.4);
 
 // eslint-disable-next-line no-unused-vars
 const Colors = {
+  lightHouse: '#f5f5f5',
+  darkHouse: '#DCDCDC',
   background: '#e2d8ce',
   redroof: '#d15d34',
   greenroof: '#bdac36',
@@ -12,14 +16,8 @@ const WindowSizes = {
   big: 5,
 };
 
-const BuildTime = 900;
+const BuildTime = 800;
 
-const EaseInOutCubic = function (time, start, change, duration) {
-  time /= duration / 2;
-  if (time < 1) return change / 2 * time * time * time + start;
-  time -= 2;
-  return change / 2 * (time * time * time + 2) + start;
-};
 
 export class Building {
   constructor(x, y, width, height, widthFraction, heightFraction, type, flip) {
@@ -49,14 +47,13 @@ export class Building {
   draw(ctx) {
     const animating = (this.creationTime !== 0);
     let value = 1;
-    let valfrac = 1;
+    // let valfrac = 1;
     if (animating) {
       const elapsedTime = Date.now() - this.creationTime;
       if (elapsedTime > BuildTime) this.creationTime = 0;
-      const starts = 0.001;
-      const ends = 1;
-      value = EaseInOutCubic(elapsedTime, starts, ends - starts, BuildTime);
-      valfrac = 1 / value;
+      value = houseBez(elapsedTime / BuildTime); // Goes between 0 and (greater than bc of bezier) 1'
+      // console.log(value);
+      // valfrac = 1 / value;
     }
 
     const { x, y, flip, type } = this;
@@ -85,12 +82,13 @@ export class Building {
         case 'longtower': this.drawLongTower(ctx, w, h, w1, h1, w2, h2, i); break;
       }
     }
-    if (animating) {
-      ctx.scale(valfrac, valfrac);
-      ctx.translate(0, -(h - (h * value)));
-    }
-    if (flip) { ctx.scale(-1, 1); ctx.translate(-w, 0); }
-    ctx.translate(-x, -y);
+    ctx.resetTransform();
+    // if (animating) {
+    //   ctx.scale(valfrac, valfrac);
+    //   ctx.translate(0, -(h - (h * value)));
+    // }
+    // if (flip) { ctx.scale(-1, 1); ctx.translate(-w, 0); }
+    // ctx.translate(-x, -y);
   } // end draw
 
   /** Draw a single window at (x, y). Does not stroke or fill */
@@ -115,7 +113,7 @@ export class Building {
     ctx.lineToRand(0, h);
     ctx.closePath();
     if (i === 0) {
-      ctx.fillStyle = 'red'; // light color
+      ctx.fillStyle = Colors.lightHouse;
       ctx.fill();
       ctx.stroke();
       ctx.beginPath(); // can skip on nonzero passes
@@ -129,7 +127,7 @@ export class Building {
     ctx.lineToRand(w1, h);
     ctx.closePath();
     if (i === 0) {
-      ctx.fillStyle = '#f5f5f5'; // light color
+      ctx.fillStyle = Colors.lightHouse;
       ctx.fill();
       ctx.stroke();
       ctx.beginPath(); // can skip on nonzero passes
@@ -176,7 +174,7 @@ export class Building {
     ctx.lineToRand(0, h);
     ctx.closePath();
     if (i === 0) {
-      ctx.fillStyle = '#f5f5f5'; // light color
+      ctx.fillStyle = Colors.lightHouse;
       ctx.fill();
       ctx.stroke();
       ctx.beginPath(); // can skip on nonzero passes
@@ -190,7 +188,7 @@ export class Building {
     ctx.lineToRand(w1, h);
     ctx.closePath();
     if (i === 0) {
-      ctx.fillStyle = '#f5f5f5'; // light color
+      ctx.fillStyle = Colors.lightHouse;
       ctx.fill();
       ctx.stroke();
       ctx.beginPath(); // can skip on nonzero passes
@@ -236,7 +234,7 @@ export class Building {
     ctx.lineToRand(0, h);
     ctx.closePath();
     if (i === 0) {
-      ctx.fillStyle = '#e6ddce'; // light color
+      ctx.fillStyle = Colors.lightHouse;
       ctx.fill();
       ctx.stroke();
       ctx.beginPath(); // can skip on nonzero passes
@@ -250,7 +248,7 @@ export class Building {
     ctx.lineToRand(w1, h);
     ctx.closePath();
     if (i === 0) {
-      ctx.fillStyle = '#e6ddce'; // light color
+      ctx.fillStyle = Colors.lightHouse;
       ctx.fill();
       ctx.stroke();
       ctx.beginPath(); // can skip on nonzero passes

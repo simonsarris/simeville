@@ -1,4 +1,12 @@
 
+### Captain's log, Feb 28, 2020
+
+Lots new: Bezier easing animated building! Sun! Dragging the sun! Stars (that shine through buildings). Darkness! We're at like 3-4 days of gods own creation rn.
+
+Dammann freres tea came in so I'm high on that earl grey yin zhen xoxo
+
+ss
+
 ### Captain's log, Feb 26, 2020
 
 HIGH TEST UPDATE LOOP. I think I won't bother with loop invalidation, since we'll want little things moving all the time anyway.
