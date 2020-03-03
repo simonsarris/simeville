@@ -5,17 +5,27 @@ const ctx = can.getContext('2d');
 
 
 CanvasRenderingContext2D.prototype.lineToRand = function (x, y) {
-  this.lineTo(x, y);
-  // const rand = 1;
-  // const halfRand = rand / 2;
-  // this.lineTo(x + (Math.random() * rand) - halfRand, y + (Math.random() * rand) - halfRand);
+  // this.lineTo(x, y);
+  const rand = 2;
+  const halfRand = rand / 2;
+  this.lineTo(x + (Math.random() * rand) - halfRand, y + (Math.random() * rand) - halfRand);
 };
 CanvasRenderingContext2D.prototype.moveToRand = function (x, y) {
-  this.moveTo(x, y);
-  // const rand = 1;
-  // const halfRand = rand / 2;
-  // this.moveTo(x + (Math.random() * rand) - halfRand, y + (Math.random() * rand) - halfRand);
+  // this.moveTo(x, y);
+  const rand = 2;
+  const halfRand = rand / 2;
+  this.moveTo(x + (Math.random() * rand) - halfRand, y + (Math.random() * rand) - halfRand);
 };
+
+CanvasRenderingContext2D.prototype.quadraticCurveToRand = function (x1, y1, x2, y2) {
+  const oldStyle = this.fillStyle;
+  this.fillStyle = 'red';
+  this.fillRect(x1, y1, 4, 4);
+  this.quadraticCurveTo(x1, y1, x2, y2);
+  this.fillStyle = oldStyle;
+};
+
+
 ctx.miterLimit = 3;
 ctx.lineWidth = 1.5;
 

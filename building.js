@@ -4,12 +4,23 @@ const houseBez = bezier(0.00, 0.75, 0.29, 1.4);
 
 // eslint-disable-next-line no-unused-vars
 const Colors = {
-  lightHouse: '#f5f5f5',
-  darkHouse: '#DCDCDC',
-  background: '#e2d8ce',
-  redroof: '#d15d34',
-  greenroof: '#bdac36',
+  lightHouse: '#DDCDB2',
+  darkHouse: '#DDCDB2',
+  background: '#DDCDB2',
+  redroof: '#DDCDB2',
+  greenroof: '#DDCDB2',
 };
+
+// const Colors = {
+//   lightHouse: '#f5f5f5',
+//   darkHouse: '#DCDCDC',
+//   background: '#e2d8ce',
+//   redroof: '#d15d34',
+//   greenroof: '#bdac36',
+// };
+
+
+
 
 const WindowSizes = {
   small: 3,
@@ -107,10 +118,10 @@ export class Building {
     //  1   2
     //  4   3
     ctx.beginPath();
-    ctx.moveToRand(0, h1);
-    ctx.lineToRand(w1, h1);
-    ctx.lineToRand(w1, h);
-    ctx.lineToRand(0, h);
+    ctx.moveTo(0, h1);
+    ctx.lineTo(w1, h1);
+    ctx.lineTo(w1, h);
+    ctx.lineTo(0, h);
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = Colors.lightHouse;
@@ -121,10 +132,10 @@ export class Building {
     // Right side face
     //  1   2
     //  4   3
-    ctx.moveToRand(w1, h1);
-    ctx.lineToRand(w, h1);
-    ctx.lineToRand(w, h);
-    ctx.lineToRand(w1, h);
+    ctx.moveTo(w1, h1);
+    ctx.lineTo(w, h1);
+    ctx.lineTo(w, h);
+    ctx.lineTo(w1, h);
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = Colors.lightHouse;
@@ -137,13 +148,13 @@ export class Building {
     //  4  1
     //   3  2
     const w1Half = (w1 / 2) * 1.4; // magic 1.4 to shorten roof
-    ctx.moveToRand(w - w1Half, 0);
-    ctx.lineToRand(w, h1); // bez?
-    ctx.lineToRand(w1, h1);
-    ctx.lineToRand(w1Half, 0); // bez?
+    ctx.moveTo(w - w1Half, 0);
+    ctx.lineTo(w, h1); // bez?
+    ctx.lineTo(w1, h1);
+    ctx.lineTo(w1Half, 0); // bez?
     ctx.closePath();
     if (i === 0) {
-      ctx.fillStyle = 'aaa'; // Right Roof
+      ctx.fillStyle = '#DDCDB2'; // Right Roof
       ctx.fill();
       ctx.stroke();
       ctx.beginPath(); // can skip on nonzero passes
@@ -151,12 +162,12 @@ export class Building {
     // Roof left
     //    1
     //  3  2
-    ctx.moveToRand(w1Half, 0);
-    ctx.lineToRand(w1, h1); // bez?
-    ctx.lineToRand(0, h1);
+    ctx.moveTo(w1Half, 0);
+    ctx.lineTo(w1, h1); // bez?
+    ctx.lineTo(0, h1);
     ctx.closePath(); // but bez?
     if (i === 0) {
-      ctx.fillStyle = '#f1f1f1'; // Left Roof
+      ctx.fillStyle = '#DDCDB2'; // Left Roof
       ctx.fill();
     }
     // don't close?
@@ -168,10 +179,10 @@ export class Building {
     //  1   2
     //  4   3
     ctx.beginPath();
-    ctx.moveToRand(0, h1);
-    ctx.lineToRand(w1, h1);
-    ctx.lineToRand(w1, h);
-    ctx.lineToRand(0, h);
+    ctx.moveTo(0, h1);
+    ctx.lineTo(w1, h1);
+    ctx.lineTo(w1, h);
+    ctx.lineTo(0, h);
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = Colors.lightHouse;
@@ -182,10 +193,10 @@ export class Building {
     // Right side face
     //  1   2
     //  4   3
-    ctx.moveToRand(w1, h1);
-    ctx.lineToRand(w, h1);
-    ctx.lineToRand(w, h);
-    ctx.lineToRand(w1, h);
+    ctx.moveTo(w1, h1);
+    ctx.lineTo(w, h1);
+    ctx.lineTo(w, h);
+    ctx.lineTo(w1, h);
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = Colors.lightHouse;
@@ -196,9 +207,9 @@ export class Building {
     // Roof right, starts at top right
     //  1
     //  3  2
-    ctx.moveToRand(w1, 0);
-    ctx.lineToRand(w, h1); // bez?
-    ctx.lineToRand(w1, h1);
+    ctx.moveTo(w1, 0);
+    ctx.lineTo(w, h1); // bez?
+    ctx.lineTo(w1, h1);
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = '#dddddd'; // roof color a
@@ -209,9 +220,9 @@ export class Building {
     // Roof RIGHT?
     //    2
     // 1  3
-    ctx.moveToRand(0, h1);
-    ctx.lineToRand(w1, 0); // bez?
-    ctx.lineToRand(w1, h1);
+    ctx.moveTo(0, h1);
+    ctx.lineTo(w1, 0); // bez?
+    ctx.lineTo(w1, h1);
     ctx.closePath(); // but bez?
     if (i === 0) {
       ctx.fillStyle = '#f1f1f1'; // roof color b
@@ -222,16 +233,17 @@ export class Building {
   }
 
   drawHouse(ctx, w, h, w1, h1, w2, h2, i) {
+    const cpy = (h1 / 2) - 5; // y control point for quadratic roof curves
     // Front face
     //    2
     //  1   3
     //  5   4
     ctx.beginPath();
-    ctx.moveToRand(0, h1);
-    ctx.lineToRand(w1 / 2, 0); // bez?
-    ctx.lineToRand(w1, h1); // bez?
-    ctx.lineToRand(w1, h);
-    ctx.lineToRand(0, h);
+    ctx.moveTo(0, h1);
+    ctx.quadraticCurveTo(w1 / 2.5, cpy, w1 / 2, 0); // bez?
+    ctx.quadraticCurveTo(w1 / 2, cpy, w1, h1); // bez?
+    ctx.lineTo(w1, h);
+    ctx.lineTo(0, h);
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = Colors.lightHouse;
@@ -242,10 +254,10 @@ export class Building {
     // Side face
     //  1   2
     //  4   3
-    ctx.moveToRand(w1, h1);
-    ctx.lineToRand(w, h1);
-    ctx.lineToRand(w, h);
-    ctx.lineToRand(w1, h);
+    ctx.moveTo(w1, h1);
+    ctx.lineTo(w, h1);
+    ctx.lineTo(w, h);
+    ctx.lineTo(w1, h);
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = Colors.lightHouse;
@@ -257,10 +269,10 @@ export class Building {
     //  4   1
     //    3   2
     const w1Half = w1 / 2;
-    ctx.moveToRand(w - w1Half, 0);
-    ctx.lineToRand(w, h1); // bez?
-    ctx.lineToRand(w1, h1);
-    ctx.lineToRand(w1Half, 0); // bez?
+    ctx.moveTo(w - w1Half, 0);
+    ctx.quadraticCurveTo(w - w1Half, cpy, w, h1); // bez?
+    ctx.lineTo(w1, h1);
+    ctx.quadraticCurveTo(w1 / 2, cpy, w1Half, 0); // bez?
     ctx.closePath();
     if (i === 0) {
       ctx.fillStyle = Colors.redroof; // roof color
