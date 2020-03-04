@@ -1,11 +1,9 @@
 
 ### Captain's log, Mar 3, 2020
 
-Now working with images for sky and foreground.
+Now working with images for sky and foreground. FEELS GOOD. Sky is parted out into its own layer (boo) but now z ordering and independent sky darkening (less dark) works (yay).
 
-Sky is parted out into its own layer (boo) but now z ordering and independent sky darkening (less dark) works (yay).
-
-gotta get a moon and put it on a pulley with the sun.
+gotta get a moon and put it on a pulley with the sun, which I hope has a somewhat amusing effect.
 
 I'm thinking of paying someone to make the graphics? It will probably take me forever if I try to do it. But then it will be harder to adapt and change it later.
 
