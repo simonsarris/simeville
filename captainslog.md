@@ -1,4 +1,16 @@
 
+### Captain's log, Mar 3, 2020
+
+Now working with images for sky and foreground.
+
+Sky is parted out into its own layer (boo) but now z ordering and independent sky darkening (less dark) works (yay).
+
+gotta get a moon and put it on a pulley with the sun.
+
+I'm thinking of paying someone to make the graphics? It will probably take me forever if I try to do it. But then it will be harder to adapt and change it later.
+
+ss
+
 ### Captain's log, Feb 28, 2020
 
 Lots new: Bezier easing animated building! Sun! Dragging the sun! Stars (that shine through buildings). Darkness! We're at like 3-4 days of gods own creation rn.

@@ -1,4 +1,16 @@
-<canvas width="600" height="600" style="width: 300px; height: 300px; background-color: #e2d8ce;" id="can"></canvas>
+
+<style>
+  .town {
+    width: 800px;
+    height: 440px;
+    position: absolute;
+  }
+</style>
+
+<div>
+  <canvas width="1600" height="880"class="town" id="sky"></canvas>
+  <canvas width="1600" height="880"class="town" id="town"></canvas>
+</div>
 <p>Width <input id="widthSlider" type="range" min="10" max="200" value="50"></p>
 <p>Height <input id="heightSlider" type="range" min="10" max="200" value="50"></p>
 <p>Width fraction <input id="widthFractionSlider" type="range" step="0.01" min="0.01" max="1" value="0.5"></p>

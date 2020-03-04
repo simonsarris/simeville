@@ -2,44 +2,13 @@
 import { Building } from './building.js';
 import { randomInt, random } from './util.js';
 
-const stars = [
-  32, 40,
-  28, 78,
-  36, 128,
-  42, 184,
-  38, 232,
-  80, 244,
-  50, 270,
-  138, 280,
-  266, 294,
-  450, 290,
-  458, 234,
-  322, 244,
-  292, 174,
-  208, 184,
-  186, 140,
-  144, 84,
-  190, 54,
-  244, 46,
-  254, 84,
-  236, 104,
-  538, 118,
-  532, 222,
-  540, 270,
-  502, 290,
-  400, 272,
-  372, 222,
-  330, 78,
-  370, 44,
-  452, 42,
-  532, 30,
-  564, 28,
-  584, 164,
-  240, 212
-];
+const SceneWidth = 1600;
+const SceneHeight = 880;
+const Stars = [];
+for (let i = 0; i < 50; i++) { Stars.push(Math.random() * 1600);  Stars.push(Math.random() * 400) };
 
 export class Town {
-  constructor(canvas) {
+  constructor(canvas, skyCanvas) {
     // eslint-disable-next-line no-param-reassign
     canvas.onselectstart = function () { return false; };
     const arr = [];
@@ -58,12 +27,21 @@ export class Town {
     this.dragStartObjectX = 0;
     this.dragStartObjectY = 0;
 
-    this.skyColor = 'hsla(199, 100%, 75%, 1)';
-    this.foreColor = '#e2d8ce'; // ehhhh lame paper color
+    // sky, sun, foreground
+    this.skyCtx = skyCanvas.getContext('2d');
     this.skylineY = this.canvas.height / 2;
+    const skyImage = new Image();
+    skyImage.src = 'images/sky.jpg';
+    this.sky = { x: 0, y: 0, width: SceneWidth, height: 400, img: skyImage };
     const sunImage = new Image();
     sunImage.src = 'images/sun.png';
     this.sun = { x: 350, y: 50, width: 150, height: 150, img: sunImage };
+    this.foreColor = '#e2d8ce'; // ehhhh lame paper color
+    const foreImage = new Image();
+    foreImage.src = 'images/foreground.png';
+    this.foreground = { x: 0, y: 0, width: SceneWidth, height: SceneHeight, img: foreImage };
+
+
 
     const self = this;
     canvas.addEventListener('mousedown', function (e) {
@@ -165,7 +143,7 @@ export class Town {
 
   draw() {
     const {
-      buildings, ctx, canvas, selection, sun, skylineY
+      buildings, ctx, canvas, selection, skylineY, sky, sun, foreground, skyCtx
     } = this; // wow. much destructure.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const sunMid = (sun.y + (sun.height / 2));
@@ -174,11 +152,17 @@ export class Town {
     const luminosity = 75 - (50 * darkness);
 
     // Sky
-    ctx.fillStyle = `hsla(203, 100%, ${luminosity}%, 1)`;
-    ctx.fillRect(0, 0, canvas.width, skylineY);
+    skyCtx.drawImage(sky.img, sky.x, sky.y, sky.width, sky.height);
     ctx.drawImage(sun.img, sun.x, sun.y, sun.width, sun.height);
-    ctx.fillStyle = this.foreColor;
-    ctx.fillRect(0, skylineY, canvas.width, canvas.height - skylineY);
+    skyCtx.fillStyle = `rgba(0, 0, 0, ${Math.min(0.9, (darkness / 1.5).toFixed(2))})`;
+    skyCtx.fillRect(0, 0, canvas.width, canvas.height);
+    // Stars
+    skyCtx.globalAlpha = darkness;
+    for (let i = 0; i < Stars.length; i += 2) {
+      skyCtx.fillStyle = 'white';
+      skyCtx.fillRect(Stars[i], Stars[i + 1], 2, 2);
+    }
+    skyCtx.globalAlpha = 1;
 
     // Buildings
     const l = buildings.length;
@@ -186,18 +170,14 @@ export class Town {
       buildings[i].draw(ctx);
     }
 
+    // Foreground
+    ctx.drawImage(foreground.img, foreground.x, foreground.y, foreground.width, foreground.height);
+
     // Darkness
+    ctx.globalCompositeOperation = 'source-atop';
     ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(0.9, darkness.toFixed(2))})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Stars
-    ctx.globalAlpha = darkness;
-    for (let i = 0; i < stars.length; i += 2) {
-      ctx.fillStyle = 'white';
-      ctx.fillRect(stars[i], stars[i + 1], 2, 2);
-    }
-    ctx.globalAlpha = 1;
-
+    ctx.globalCompositeOperation = 'source-over';
 
     if (selection) {
       ctx.strokeStyle = 'lime';

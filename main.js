@@ -1,7 +1,6 @@
 import { Town } from './town.js';
 
-const can = document.getElementById('can');
-const ctx = can.getContext('2d');
+
 
 
 CanvasRenderingContext2D.prototype.lineToRand = function (x, y) {
@@ -26,16 +25,18 @@ CanvasRenderingContext2D.prototype.quadraticCurveToRand = function (x1, y1, x2, 
 };
 
 
-ctx.miterLimit = 3;
-ctx.lineWidth = 1.5;
-
 let globalWidth = 70;
 let globalHeight = 25 + 32;
 let globalWidthFraction = 0.5;
 let globalHeightFraction = 0.5;
 let town;
 function main() {
-  town = new Town(can);
+  const can = document.getElementById('town');
+  const ctx = can.getContext('2d');
+  ctx.miterLimit = 3;
+  ctx.lineWidth = 1.5;
+  const sky = document.getElementById('sky');
+  town = new Town(can, sky);
   town.draw();
   window.town = town;
 }
