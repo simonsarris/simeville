@@ -1,4 +1,13 @@
 
+### Captain's log, Mar 4, 2020
+
+Behold, dear reader, the Moon.
+
+Let us all try to be more like the Moon.
+
+ss
+
+
 ### Captain's log, Mar 3, 2020
 
 Now working with images for sky and foreground. FEELS GOOD. Sky is parted out into its own layer (boo) but now z ordering and independent sky darkening (less dark) works (yay).

@@ -35,8 +35,10 @@ export class Town {
     this.sky = { x: 0, y: 0, width: SceneWidth, height: 400, img: skyImage };
     const sunImage = new Image();
     sunImage.src = 'images/sun.png';
-    this.sun = { x: 350, y: 50, width: 150, height: 150, img: sunImage };
-    this.foreColor = '#e2d8ce'; // ehhhh lame paper color
+    this.sun = { x: 950, y: 50, width: 150, height: 150, img: sunImage };
+    const moonImage = new Image();
+    moonImage.src = 'images/moon.png';
+    this.moon = { x: 350, y: 600, width: 75, height: 75, img: moonImage };
     const foreImage = new Image();
     foreImage.src = 'images/foreground.png';
     this.foreground = { x: 0, y: 0, width: SceneWidth, height: SceneHeight, img: foreImage };
@@ -48,13 +50,15 @@ export class Town {
       // if (self.mode !== 'drag') return;
       self.setCoords(e);
       const { x, y } = self;
-      // ?? right now only drags sun. THIS IS WEAK. WHAT ABOUT MOONS? etc
-      if (self.containsObject(x, y, self.sun)) {
-        self.draggedObject = self.sun;
+      // ehh
+      if (self.containsObject(x, y, self.sun)) self.draggedObject = self.sun;
+      if (self.containsObject(x, y, self.moon)) self.draggedObject = self.moon;
+
+      if (self.draggedObject !== null) {
         self.dragStartX = x;
         self.dragStartY = y;
-        self.dragStartObjectX = self.sun.x;
-        self.dragStartObjectY = self.sun.y;
+        self.dragStartObjectX = self.draggedObject.x;
+        self.dragStartObjectY = self.draggedObject.y;
       }
     });
 
@@ -63,8 +67,13 @@ export class Town {
       if (self.draggedObject === null) return;
       self.setCoords(e);
       const { x, y } = self;
-      self.sun.x = self.dragStartObjectX - (self.dragStartX - x);
-      self.sun.y = self.dragStartObjectY - (self.dragStartY - y);
+      self.draggedObject.x = self.dragStartObjectX - (self.dragStartX - x);
+      self.draggedObject.y = self.dragStartObjectY - (self.dragStartY - y);
+      if (self.draggedObject === self.sun) {
+        self.moon.y = Math.max(20, 650 - self.sun.y);
+      } else if (self.draggedObject === self.moon) {
+        self.sun.y = Math.max(20, 650 - self.moon.y);
+      }
     });
 
     canvas.addEventListener('mouseup', function (e) {
@@ -143,21 +152,23 @@ export class Town {
 
   draw() {
     const {
-      buildings, ctx, canvas, selection, skylineY, sky, sun, foreground, skyCtx
+      buildings, ctx, canvas, selection, skylineY, sky, sun, moon, foreground, skyCtx
     } = this; // wow. much destructure.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const sunMid = (sun.y + (sun.height / 2));
-    const darkness = Math.max(0, ((sunMid - skylineY) / (canvas.height - skylineY)));
-
+    let darkness = Math.max(0, ((sunMid - skylineY) / (canvas.height - skylineY - 200)));
+    darkness *= 1.75;
     const luminosity = 75 - (50 * darkness);
 
     // Sky
     skyCtx.drawImage(sky.img, sky.x, sky.y, sky.width, sky.height);
     ctx.drawImage(sun.img, sun.x, sun.y, sun.width, sun.height);
-    skyCtx.fillStyle = `rgba(0, 0, 0, ${Math.min(0.9, (darkness / 1.5).toFixed(2))})`;
+    skyCtx.fillStyle = `rgba(0, 0, 0, ${Math.min(0.9, (darkness / 2).toFixed(2))})`;
     skyCtx.fillRect(0, 0, canvas.width, canvas.height);
+    skyCtx.drawImage(moon.img, moon.x, moon.y, moon.width, moon.height);
     // Stars
-    skyCtx.globalAlpha = darkness;
+    skyCtx.globalAlpha = Math.min(1, darkness * 3);
+    console.log(skyCtx.globalAlpha);
     for (let i = 0; i < Stars.length; i += 2) {
       skyCtx.fillStyle = 'white';
       skyCtx.fillRect(Stars[i], Stars[i + 1], 2, 2);
