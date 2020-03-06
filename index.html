@@ -3,22 +3,24 @@
   .town {
     width: 800px;
     height: 440px;
-    position: absolute;
+    grid-column: 1;
+    grid-row: 1;
   }
 </style>
 
-<div>
+<div style="display: grid;">
   <canvas width="1600" height="880"class="town" id="sky"></canvas>
   <canvas width="1600" height="880"class="town" id="town"></canvas>
 </div>
-<p>Width <input id="widthSlider" type="range" min="10" max="200" value="50"></p>
+
+<p><a href="https://github.com/simonsarris/simeville">simeville repo on github</a></p>
+<p><a href="https://twitter.com/simonsarris">simonsarris</a></p>
+
+<!-- <p>Width <input id="widthSlider" type="range" min="10" max="200" value="50"></p>
 <p>Height <input id="heightSlider" type="range" min="10" max="200" value="50"></p>
 <p>Width fraction <input id="widthFractionSlider" type="range" step="0.01" min="0.01" max="1" value="0.5"></p>
-<p>Height fraction <input id="heightFractionSlider" type="range" step="0.01" min="0.01" max="1" value="0.5"></p>
+<p>Height fraction <input id="heightFractionSlider" type="range" step="0.01" min="0.01" max="1" value="0.5"></p> -->
 
 
 <script type="module" src="./main.js"></script>
 
-<!-- <script src="util.js"></script>
-<script src="building.js"></script>
-<script src="main.js"></script> -->
