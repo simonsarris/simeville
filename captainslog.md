@@ -1,4 +1,13 @@
 
+### Captain's log, Mar 5, 2020
+
+w e w lads. Added a stars.png with constellations, that rotates. Photoshopping this well is gonna take a really long time.
+
+Perhaps just leave it as it is for now.
+
+ss
+
+
 ### Captain's log, Mar 4, 2020
 
 Behold, dear reader, the Moon.

@@ -39,6 +39,9 @@ export class Town {
     const moonImage = new Image();
     moonImage.src = 'images/moon.png';
     this.moon = { x: 350, y: 600, width: 75, height: 75, img: moonImage };
+    const starsImage = new Image();
+    starsImage.src = 'images/stars.png';
+    this.stars = { x: 0, y: -200, width: 1600, height: 1600, img: starsImage, rotation: 0 };
     const foreImage = new Image();
     foreImage.src = 'images/foreground.png';
     this.foreground = { x: 0, y: 0, width: SceneWidth, height: SceneHeight, img: foreImage };
@@ -152,7 +155,7 @@ export class Town {
 
   draw() {
     const {
-      buildings, ctx, canvas, selection, skylineY, sky, sun, moon, foreground, skyCtx
+      buildings, ctx, canvas, selection, skylineY, sky, sun, moon, stars, foreground, skyCtx
     } = this; // wow. much destructure.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const sunMid = (sun.y + (sun.height / 2));
@@ -165,8 +168,18 @@ export class Town {
     ctx.drawImage(sun.img, sun.x, sun.y, sun.width, sun.height);
     skyCtx.fillStyle = `rgba(0, 0, 0, ${Math.min(0.9, (darkness / 2).toFixed(2))})`;
     skyCtx.fillRect(0, 0, canvas.width, canvas.height);
+    // Stars png
+    stars.rotation += 0.001;
+    skyCtx.globalAlpha = darkness / 3;
+    skyCtx.translate(stars.width / 2, stars.y + (stars.height / 2));
+    skyCtx.rotate(stars.rotation);
+    skyCtx.translate(-stars.width / 2, -stars.y - (stars.height) / 2);
+    skyCtx.drawImage(stars.img, stars.x, stars.y, stars.width, stars.height);
+    skyCtx.resetTransform();
+    skyCtx.globalAlpha = 1;
+    // Moon
     skyCtx.drawImage(moon.img, moon.x, moon.y, moon.width, moon.height);
-    // Stars
+    // Stars basic
     skyCtx.globalAlpha = Math.min(1, darkness * 3);
     console.log(skyCtx.globalAlpha);
     for (let i = 0; i < Stars.length; i += 2) {
