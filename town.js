@@ -181,7 +181,7 @@ export class Town {
     skyCtx.drawImage(moon.img, moon.x, moon.y, moon.width, moon.height);
     // Stars basic
     skyCtx.globalAlpha = Math.min(1, darkness * 3);
-    console.log(skyCtx.globalAlpha);
+    // ??? debug console.log(skyCtx.globalAlpha);
     for (let i = 0; i < Stars.length; i += 2) {
       skyCtx.fillStyle = 'white';
       skyCtx.fillRect(Stars[i], Stars[i + 1], 2, 2);
