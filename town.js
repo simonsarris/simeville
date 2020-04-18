@@ -5,7 +5,7 @@ import { randomInt, random } from './util.js';
 const SceneWidth = 1600;
 const SceneHeight = 880;
 const Stars = [];
-for (let i = 0; i < 50; i++) { Stars.push(Math.random() * 1600);  Stars.push(Math.random() * 400) };
+for (let i = 0; i < 50; i++) { Stars.push(Math.random() * 1600); Stars.push(Math.random() * 400); }
 
 export class Town {
   constructor(canvas, skyCanvas) {
@@ -103,35 +103,16 @@ export class Town {
   }
 
   buildHouse(x, y) {
+    console.log(x, y);
     let w = 80;
     let h = 90;
-    let wf = 0.5;
-    let hf = 0.5;
-    const flip = Math.random() > 0.5;
-    let type = 'house';
-    const rando = Math.random();
-    if (rando < 0.70) {
-      type = 'house';
-      w = randomInt(60, 90);
-      h = randomInt(50, 80);
-      wf = random(0.2, 0.7);
-      hf = random(0.45, 0.60);
-      // TODO: If aspect ratio is too tall (low)
-      //       then either make it less tall or more wide
-    } else if (rando < 0.85) {
-      type = 'tower';
-      w = randomInt(20, 40);
-      h = randomInt(150, 200);
-      wf = 0.5;
-      hf = random(0.3, 0.4);
-    } else {
-      type = 'longtower';
-      w = randomInt(25, 75);
-      h = randomInt(50, 100);
-      wf = random(0.2, 0.7);
-      hf = random(0.5, 0.7);
-    }
-    const newbuilding = new Building(x - (w / 2), y - h, w, h, wf, hf, type, flip);
+    const flip = false; // Math.random() > 0.5;
+    // temp: use a single picture, tower1.png:
+    const tower1 = new Image();
+    tower1.src = 'images/buildings/tower1.png';
+    w = 92;
+    h = 216;
+    const newbuilding = new Building(x, y, w, h, flip, tower1);
     this.buildings.push(newbuilding);
     this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
     newbuilding.build();

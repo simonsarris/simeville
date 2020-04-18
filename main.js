@@ -54,9 +54,3 @@ function sliderChange(e) {
     town.selection.updateValues(globalWidth, globalHeight, globalWidthFraction, globalHeightFraction);
   }
 }
-
-document.getElementById('widthSlider').addEventListener('input', sliderChange);
-document.getElementById('heightSlider').addEventListener('input', sliderChange);
-document.getElementById('widthFractionSlider').addEventListener('input', sliderChange);
-document.getElementById('heightFractionSlider').addEventListener('input', sliderChange);
-

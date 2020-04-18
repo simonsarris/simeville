@@ -31,15 +31,13 @@ const BuildTime = 800;
 
 
 export class Building {
-  constructor(x, y, width, height, widthFraction, heightFraction, type, flip) {
+  constructor(x, y, width, height, flip, img) {
     this.x = x || 0;
     this.y = y || 0;
     this.width = width || 70;
     this.height = height || 58;
-    this.widthFraction = widthFraction || 0.5;
-    this.heightFraction = heightFraction || 0.5;
     this.flip = flip;
-    this.type = type || 'house'; // house, tower, longtower
+    this.img = img; // may be undefined
     // Animation:
     this.creationTime = 0; // Not yet
   }
@@ -67,32 +65,17 @@ export class Building {
       // valfrac = 1 / value;
     }
 
-    const { x, y, flip, type } = this;
+    const { x, y, flip, img } = this;
     const w = this.width;
     const h = this.height;
-    const wf = this.widthFraction;
-    const hf = this.heightFraction;
-    // const aspectRatio = w / h;
-    // divide width and height into fractions for roof and sides
-    const w1 = w * wf;
-    const w2 = w - w1;
-    const h1 = h * hf;
-    const h2 = h - h1;
-    const rounds = 2;
     ctx.translate(x, y);
     if (flip) { ctx.translate(w, 0); ctx.scale(-1, 1); }
     if (animating) {
       ctx.translate(0, h - (h * value));
       ctx.scale(value, value);
     }
-    for (let i = 0; i < rounds; i++) {
-      // gross and weird
-      switch (type) {
-        case 'house': this.drawHouse(ctx, w, h, w1, h1, w2, h2, i); break;
-        case 'tower': this.drawTower(ctx, w, h, w1, h1, w2, h2, i); break;
-        case 'longtower': this.drawLongTower(ctx, w, h, w1, h1, w2, h2, i); break;
-      }
-    }
+    ctx.drawImage(img, x, y); // NYI
+    ctx.fillStyle = 'red'; ctx.fillRect(x, y, 5, 5);
     ctx.resetTransform();
     // if (animating) {
     //   ctx.scale(valfrac, valfrac);
@@ -102,14 +85,7 @@ export class Building {
     // ctx.translate(-x, -y);
   } // end draw
 
-  /** Draw a single window at (x, y). Does not stroke or fill */
-  drawWindow(ctx, x, y, windowSize) {
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + windowSize, y);
-    ctx.lineTo(x + windowSize, y + (windowSize * 2.3));
-    ctx.lineTo(x, y + (windowSize * 2.3));
-    ctx.closePath();
-  }
+
 
   drawLongTower(ctx, w, h, w1, h1, w2, h2, i) {
     // Long towers have a short face and a long face
