@@ -65,17 +65,14 @@ export class Building {
       // valfrac = 1 / value;
     }
 
-    const { x, y, flip, img } = this;
-    const w = this.width;
-    const h = this.height;
+    const { x, y, flip, img, width, height } = this;
     ctx.translate(x, y);
-    if (flip) { ctx.translate(w, 0); ctx.scale(-1, 1); }
+    if (flip) { ctx.translate(width, 0); ctx.scale(-1, 1); }
     if (animating) {
-      ctx.translate(0, h - (h * value));
+      ctx.translate(0, height - (height * value));
       ctx.scale(value, value);
     }
-    ctx.drawImage(img, x, y); // NYI
-    ctx.fillStyle = 'red'; ctx.fillRect(x, y, 5, 5);
+    ctx.drawImage(img, 0, 0, width, height); // NYI
     ctx.resetTransform();
     // if (animating) {
     //   ctx.scale(valfrac, valfrac);

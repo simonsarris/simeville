@@ -112,7 +112,8 @@ export class Town {
     tower1.src = 'images/buildings/tower1.png';
     w = 92;
     h = 216;
-    const newbuilding = new Building(x, y, w, h, flip, tower1);
+    // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
+    const newbuilding = new Building(x, y, w / 2, h / 2, flip, tower1);
     this.buildings.push(newbuilding);
     this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
     newbuilding.build();
@@ -142,7 +143,7 @@ export class Town {
     const sunMid = (sun.y + (sun.height / 2));
     let darkness = Math.max(0, ((sunMid - skylineY) / (canvas.height - skylineY - 200)));
     darkness *= 1.75;
-    const luminosity = 75 - (50 * darkness);
+    // const luminosity = 75 - (50 * darkness);
 
     // Sky
     skyCtx.drawImage(sky.img, sky.x, sky.y, sky.width, sky.height);
