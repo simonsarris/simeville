@@ -6,6 +6,10 @@ Haven't had much time to work on this! I hoped to be farther along by now.
 
 I'm adding some building templates, and tried to make a few pixel-art-ish towers, but I'm very bad at this part.
 
+One possibility here is to pay someone else to do the art, but then any time I want to add something I'll need to bug them again, or else try to copy their style, so it would make updating anything in the future more onerous. Besides I really should have better art chops w.r.t. digital illustration.
+
+My cat caught his first rodent today. Proud of him.
+
 ss
 
 
