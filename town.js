@@ -46,6 +46,15 @@ export class Town {
     foreImage.src = 'images/foreground.png';
     this.foreground = { x: 0, y: 0, width: SceneWidth, height: SceneHeight, img: foreImage };
 
+    this.buildingsImage = new Image();
+    this.buildingsImage.src = 'images/buildings/buildings-template.png';
+    this.buildingsImages = [
+      { x: 8, y: 136, w: 30, h: 60 },
+      { x: 46, y: 93, w: 31, h: 104 },
+      { x: 91, y: 72, w: 32, h: 125 },
+      { x: 173, y: 154, w: 49, h: 41 },
+    ];
+    this.lastBuiltIndex = 0;
 
 
     const self = this;
@@ -107,16 +116,18 @@ export class Town {
     let w = 80;
     let h = 90;
     const flip = false; // Math.random() > 0.5;
-    // temp: use a single picture, tower1.png:
-    const tower1 = new Image();
-    tower1.src = 'images/buildings/tower1.png';
-    w = 92;
-    h = 216;
+    // use a sprite map of buildings
+    const building = this.buildingsImages[this.lastBuiltIndex];
+    // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
+    w = building.w * 2.5;
+    h = building.h * 2.5;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
-    const newbuilding = new Building(x, y, w / 2, h / 2, flip, tower1);
+    const newbuilding = new Building(x - (building.w/2), y - building.h, w / 2, h / 2, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
     this.buildings.push(newbuilding);
     this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
     newbuilding.build();
+    this.lastBuiltIndex++;
+    if (this.lastBuiltIndex >= this.buildingsImages.length) this.lastBuiltIndex = 0;
   }
 
   selectHouse(x, y) {
@@ -140,6 +151,7 @@ export class Town {
       buildings, ctx, canvas, selection, skylineY, sky, sun, moon, stars, foreground, skyCtx
     } = this; // wow. much destructure.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingEnabled = false; // could set this once in constructor if it will never get reset
     const sunMid = (sun.y + (sun.height / 2));
     let darkness = Math.max(0, ((sunMid - skylineY) / (canvas.height - skylineY - 200)));
     darkness *= 1.75;
@@ -177,7 +189,8 @@ export class Town {
     }
 
     // Foreground
-    ctx.drawImage(foreground.img, foreground.x, foreground.y, foreground.width, foreground.height);
+    // TEMP off
+    // ctx.drawImage(foreground.img, foreground.x, foreground.y, foreground.width, foreground.height);
 
     // Darkness
     ctx.globalCompositeOperation = 'source-atop';

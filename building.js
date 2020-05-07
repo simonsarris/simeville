@@ -31,13 +31,17 @@ const BuildTime = 800;
 
 
 export class Building {
-  constructor(x, y, width, height, flip, img) {
+  constructor(x, y, width, height, flip, img, imgx, imgy, imgw, imgh) {
     this.x = x || 0;
     this.y = y || 0;
     this.width = width || 70;
     this.height = height || 58;
     this.flip = flip;
     this.img = img; // may be undefined
+    this.imgx = imgx;
+    this.imgy = imgy;
+    this.imgw = imgw;
+    this.imgh = imgh;
     // Animation:
     this.creationTime = 0; // Not yet
   }
@@ -72,7 +76,12 @@ export class Building {
       ctx.translate(0, height - (height * value));
       ctx.scale(value, value);
     }
-    ctx.drawImage(img, 0, 0, width, height); // NYI
+    if (this.imgx) {
+      ctx.drawImage(img,  this.imgx, this.imgy, this.imgw, this.imgh, 0, 0, width, height);
+    } else {
+      ctx.drawImage(img, 0, 0, width, height); // NYI
+    }
+
     ctx.resetTransform();
     // if (animating) {
     //   ctx.scale(valfrac, valfrac);

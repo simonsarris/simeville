@@ -1,4 +1,14 @@
 
+
+### Captain's log, May 7, 2020
+
+Haven't had much time to work on this! I hoped to be farther along by now.
+
+I'm adding some building templates, and tried to make a few pixel-art-ish towers, but I'm very bad at this part.
+
+ss
+
+
 ### Captain's log, Mar 5, 2020
 
 w e w lads. Added a stars.png with constellations, that rotates. Photoshopping this well is gonna take a really long time.
