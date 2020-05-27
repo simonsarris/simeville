@@ -217,8 +217,7 @@ export class Town {
     }
 
     // Foreground
-    // TEMP off
-    // ctx.drawImage(foreground.img, foreground.x, foreground.y, foreground.width, foreground.height);
+    ctx.drawImage(foreground.img, foreground.x, foreground.y, foreground.width, foreground.height);
 
     // Darkness
     ctx.globalCompositeOperation = 'source-atop';
