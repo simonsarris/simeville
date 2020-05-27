@@ -7,6 +7,19 @@ const SceneHeight = 880;
 const Stars = [];
 for (let i = 0; i < 50; i++) { Stars.push(Math.random() * 1600); Stars.push(Math.random() * 400); }
 
+// horizon is approx 400
+// buildings should span horizontally from 0 to 1600
+const TownBuildings = [];
+const BuildingCount = 250;
+const BuildingInterval = SceneWidth / BuildingCount;
+for (let i = 0; i < BuildingCount; i++) {
+  TownBuildings.push({
+    x: (BuildingInterval * i) + (Math.random() * 10),
+    y: 405 + (Math.random() * 20)
+  });
+}
+
+
 export class Town {
   constructor(canvas, skyCanvas) {
     // eslint-disable-next-line no-param-reassign
@@ -49,10 +62,22 @@ export class Town {
     this.buildingsImage = new Image();
     this.buildingsImage.src = 'images/buildings/buildings-template.png';
     this.buildingsImages = [
-      { x: 8, y: 136, w: 30, h: 60 },
-      { x: 46, y: 93, w: 31, h: 104 },
-      { x: 91, y: 72, w: 32, h: 125 },
-      { x: 173, y: 154, w: 49, h: 41 },
+      { x: 28, y: 415, w: 95, h: 174 },
+      { x: 143, y: 271, w: 115, h: 326 },
+      { x: 265, y: 213, w: 110, h: 385 },
+      { x: 407, y: 398, w: 99, h: 197 },
+      { x: 512, y: 452, w: 165, h: 145 },
+      { x: 678, y: 173, w: 111, h: 420 },
+      { x: 808, y: 195, w: 61, h: 399 },
+      { x: 895, y: 305, w: 160, h: 293 },
+      { x: 1095, y: 416, w: 155, h: 177 },
+      { x: 1275, y: 504, w: 112, h: 86 },
+      { x: 1401, y: 479, w: 117, h: 97 },
+      { x: 1552, y: 438, w: 110, h: 160 },
+      { x: 1748, y: 0, w: 290, h: 593 }, // cathedral
+      { x: 2108, y: 262, w: 60, h: 332 },
+      { x: 2335, y: 290, w: 113, h: 298 },
+      { x: 2474, y: 431, w: 188, h: 167 },
     ];
     this.lastBuiltIndex = 0;
 
@@ -103,6 +128,7 @@ export class Town {
     this.update();
   }
 
+
   // the only reason this sets x/y is to avoid allocating an array because I'm a grinch
   setCoords(e) {
     const can = this.canvas;
@@ -111,23 +137,25 @@ export class Town {
     this.y = (e.clientY - box.top) * (can.height / box.height);
   }
 
-  buildHouse(x, y) {
+  buildHouse(x, y, optionalBuildingIndex) {
     console.log(x, y);
     let w = 80;
     let h = 90;
     const flip = false; // Math.random() > 0.5;
     // use a sprite map of buildings
-    const building = this.buildingsImages[this.lastBuiltIndex];
+    const building = this.buildingsImages[optionalBuildingIndex || this.lastBuiltIndex];
     // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
-    w = building.w * 2.5;
-    h = building.h * 2.5;
+    w = building.w;
+    h = building.h;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
-    const newbuilding = new Building(x - (building.w/2), y - building.h, w / 2, h / 2, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
+    const newbuilding = new Building(x - (building.w/2), y - building.h, w, h, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
     this.buildings.push(newbuilding);
     this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
     newbuilding.build();
-    this.lastBuiltIndex++;
-    if (this.lastBuiltIndex >= this.buildingsImages.length) this.lastBuiltIndex = 0;
+    if (optionalBuildingIndex === undefined) {
+      this.lastBuiltIndex++;
+      if (this.lastBuiltIndex >= this.buildingsImages.length) this.lastBuiltIndex = 0;
+    }
   }
 
   selectHouse(x, y) {
@@ -220,6 +248,35 @@ export class Town {
     return ((obj.x <= x) && ((obj.x + obj.width) >= x) &&
       (obj.y <= y) && ((obj.y + obj.height) >= y));
   }
+
+
+  // Create a bunch of buildings and animate them in sequence
+  ITS_TIME_TO_BUILD() {
+    // it's time to randomize the building order:
+    for(let i = TownBuildings.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * i)
+      const temp = TownBuildings[i]
+      TownBuildings[i] = TownBuildings[j]
+      TownBuildings[j] = temp
+    }
+    const smallHouses = [0, 4, 8, 9, 10];
+
+    for (var i = 0; i < TownBuildings.length; i ++) {
+      const building = TownBuildings[i];
+      const self = this;
+      let heightAdjustment = i / 2;
+      setTimeout(function() {
+        if (Math.random() < 0.7) {
+          var buildingType = smallHouses[Math.floor(Math.random() * smallHouses.length)];
+          self.buildHouse(building.x, building.y - heightAdjustment, buildingType);
+        } else {
+          self.buildHouse(building.x, building.y - heightAdjustment);
+        }
+      }, i*15);
+    }
+    
+  }
+
 }
 
 

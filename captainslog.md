@@ -1,5 +1,16 @@
 
 
+### Captain's log, May 27, 2020
+
+## IT'S TIME TO BUILD
+
+Finally becoming a little village. Added a button to build lots of things at once. It works but its very random. To look good, choreography is needed.
+
+Some cleanup has been done on building.js, but oh boy is more needed.
+
+We are almost out of tea, and just in time, the weather's so hot I have wanted nothing but espresso and a beer.
+
+
 ### Captain's log, May 7, 2020
 
 Haven't had much time to work on this! I hoped to be farther along by now.

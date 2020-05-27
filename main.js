@@ -39,6 +39,7 @@ function main() {
   town = new Town(can, sky);
   town.draw();
   window.town = town;
+  document.getElementById('timeToBuild').addEventListener('click', function() { town.ITS_TIME_TO_BUILD(); })
 }
 
 main();

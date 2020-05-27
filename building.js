@@ -71,11 +71,18 @@ export class Building {
 
     const { x, y, flip, img, width, height } = this;
     ctx.translate(x, y);
+
+    // Lazy 2x pixel ratio for the buildings:
+    ctx.translate(width/2, height/2);
+    ctx.scale(0.5, 0.5);
+
     if (flip) { ctx.translate(width, 0); ctx.scale(-1, 1); }
     if (animating) {
       ctx.translate(0, height - (height * value));
       ctx.scale(value, value);
     }
+
+    
     if (this.imgx) {
       ctx.drawImage(img,  this.imgx, this.imgy, this.imgw, this.imgh, 0, 0, width, height);
     } else {
@@ -92,218 +99,6 @@ export class Building {
   } // end draw
 
 
-
-  drawLongTower(ctx, w, h, w1, h1, w2, h2, i) {
-    // Long towers have a short face and a long face
-
-    // Front left face
-    //  1   2
-    //  4   3
-    ctx.beginPath();
-    ctx.moveTo(0, h1);
-    ctx.lineTo(w1, h1);
-    ctx.lineTo(w1, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = Colors.lightHouse;
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath(); // can skip on nonzero passes
-    }
-    // Right side face
-    //  1   2
-    //  4   3
-    ctx.moveTo(w1, h1);
-    ctx.lineTo(w, h1);
-    ctx.lineTo(w, h);
-    ctx.lineTo(w1, h);
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = Colors.lightHouse;
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath(); // can skip on nonzero passes
-    }
-
-    // Roof right, starts at top right
-    //  4  1
-    //   3  2
-    const w1Half = (w1 / 2) * 1.4; // magic 1.4 to shorten roof
-    ctx.moveTo(w - w1Half, 0);
-    ctx.lineTo(w, h1); // bez?
-    ctx.lineTo(w1, h1);
-    ctx.lineTo(w1Half, 0); // bez?
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = '#DDCDB2'; // Right Roof
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath(); // can skip on nonzero passes
-    }
-    // Roof left
-    //    1
-    //  3  2
-    ctx.moveTo(w1Half, 0);
-    ctx.lineTo(w1, h1); // bez?
-    ctx.lineTo(0, h1);
-    ctx.closePath(); // but bez?
-    if (i === 0) {
-      ctx.fillStyle = '#DDCDB2'; // Left Roof
-      ctx.fill();
-    }
-    // don't close?
-    ctx.stroke();
-  }
-
-  drawTower(ctx, w, h, w1, h1, w2, h2, i) {
-    // Front left face
-    //  1   2
-    //  4   3
-    ctx.beginPath();
-    ctx.moveTo(0, h1);
-    ctx.lineTo(w1, h1);
-    ctx.lineTo(w1, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = Colors.lightHouse;
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath(); // can skip on nonzero passes
-    }
-    // Right side face
-    //  1   2
-    //  4   3
-    ctx.moveTo(w1, h1);
-    ctx.lineTo(w, h1);
-    ctx.lineTo(w, h);
-    ctx.lineTo(w1, h);
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = Colors.lightHouse;
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath(); // can skip on nonzero passes
-    }
-    // Roof right, starts at top right
-    //  1
-    //  3  2
-    ctx.moveTo(w1, 0);
-    ctx.lineTo(w, h1); // bez?
-    ctx.lineTo(w1, h1);
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = '#dddddd'; // roof color a
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath();
-    }
-    // Roof RIGHT?
-    //    2
-    // 1  3
-    ctx.moveTo(0, h1);
-    ctx.lineTo(w1, 0); // bez?
-    ctx.lineTo(w1, h1);
-    ctx.closePath(); // but bez?
-    if (i === 0) {
-      ctx.fillStyle = '#f1f1f1'; // roof color b
-      ctx.fill();
-    }
-    // don't close?
-    ctx.stroke();
-  }
-
-  drawHouse(ctx, w, h, w1, h1, w2, h2, i) {
-    const cpy = (h1 / 2) - 5; // y control point for quadratic roof curves
-    // Front face
-    //    2
-    //  1   3
-    //  5   4
-    ctx.beginPath();
-    ctx.moveTo(0, h1);
-    ctx.quadraticCurveTo(w1 / 2.5, cpy, w1 / 2, 0); // bez?
-    ctx.quadraticCurveTo(w1 / 2, cpy, w1, h1); // bez?
-    ctx.lineTo(w1, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = Colors.lightHouse;
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath(); // can skip on nonzero passes
-    }
-    // Side face
-    //  1   2
-    //  4   3
-    ctx.moveTo(w1, h1);
-    ctx.lineTo(w, h1);
-    ctx.lineTo(w, h);
-    ctx.lineTo(w1, h);
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = Colors.lightHouse;
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath(); // can skip on nonzero passes
-    }
-    // Roof, starts at top right
-    //  4   1
-    //    3   2
-    const w1Half = w1 / 2;
-    ctx.moveTo(w - w1Half, 0);
-    ctx.quadraticCurveTo(w - w1Half, cpy, w, h1); // bez?
-    ctx.lineTo(w1, h1);
-    ctx.quadraticCurveTo(w1 / 2, cpy, w1Half, 0); // bez?
-    ctx.closePath();
-    if (i === 0) {
-      ctx.fillStyle = Colors.redroof; // roof color
-      ctx.fill();
-    }
-    ctx.stroke();
-
-    if (i === 0) {
-      // Now draw windows
-
-      ctx.beginPath();
-
-      // // Right side along the rect
-      // // From w1 to w
-      // // From h1 to h
-      // let y = h1;
-      const windowSize = WindowSizes.small;
-      // let numWindows = Math.floor(w2 / windowSize / 2) - 1; // Max
-      // // randomize windows on half
-      // if (Math.random() > 0.5) numWindows = Math.floor(Math.random() * numWindows);
-      // let x = w1 + (w2 - ((numWindows * 2) - 1) * windowSize) / 2;
-      // const startX = x;
-      // const numRows = (Math.random() * 3) | 0;
-      // for (let rows = 0; rows < numRows; rows++) {
-      //   for (let k = 0; k < numWindows; k++) {
-      //     this.drawWindow(ctx, x, y + windowSize, windowSize);
-      //     x += windowSize * 2;
-      //   }
-      //   y += windowSize * 4;
-      //   x = startX;
-      //   if (y + windowSize * 3 > h) break; // very lazy way to stop drawing more vertical windows
-      // }
-
-      // Left side, along the attic triangle and below it
-      // x = 0;
-      let y = h1 / 2;
-      const halfWindow = windowSize / 2;
-      const centered = (w1 / 2) - halfWindow;
-      this.drawWindow(ctx, centered, y, windowSize);
-      y += windowSize * 4;
-      // Maybe 2 more
-      this.drawWindow(ctx, centered - windowSize * 2, y, windowSize);
-      this.drawWindow(ctx, centered + windowSize * 2, y, windowSize);
-
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      ctx.fill();
-    }
-  }
 } // end class
 
 export default Building;
