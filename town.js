@@ -271,7 +271,7 @@ export class Town {
         } else {
           self.buildHouse(building.x, building.y - heightAdjustment);
         }
-      }, i*15);
+      }, i*25);
     }
     
   }
