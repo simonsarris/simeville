@@ -265,7 +265,7 @@ export class Town {
       const self = this;
       let heightAdjustment = i / 2;
       setTimeout(function() {
-        if (Math.random() < 0.7) {
+        if (Math.random() < 0.8) {
           var buildingType = smallHouses[Math.floor(Math.random() * smallHouses.length)];
           self.buildHouse(building.x, building.y - heightAdjustment, buildingType);
         } else {
