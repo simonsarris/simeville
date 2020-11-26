@@ -139,6 +139,8 @@ export class Town {
     canvas.addEventListener('mouseup', function (e) {
       if (self.draggedObject !== null) {
         self.draggedObject = null;
+        self.updateZOrder();
+        self.draw();
         //return;
       }
       self.setCoords(e);
@@ -148,6 +150,24 @@ export class Town {
       
     });
 
+    canvas.addEventListener('keydown', function(e) {
+      e.preventDefault();
+      if (e.key === 'Delete' && self.selection !== null) {
+        self.buildings.splice(self.buildings.indexOf(self.selection), 1);
+        self.selection = null;
+        self.draw();
+      } else if (e.key.match('[1-9]') !== null) {
+        self.currentBuildingIndex = parseInt(e.key);
+      } else if (e.key === "ArrowRight") {
+        self.currentBuildingIndex++;
+      } else if (e.key === "ArrowLeft") {
+        self.currentBuildingIndex--;
+      } else if (e.key === "ArrowUp") { // are you regetting that this isn't a switch statement yet?
+        self.moveSelectionZ(true);
+      } else if (e.key === "ArrowDown") {
+        self.moveSelectionZ(false);
+      }
+    });
     canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     canvas.addEventListener('selectstart', function (e) { e.preventDefault(); });
     this.update();
@@ -172,13 +192,33 @@ export class Town {
     const h = building.h;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
     const newbuilding = new Building(x, y, w, h, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
-    this.buildings.push(newbuilding);
-    this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
+    this.buildings.unshift(newbuilding);
+    this.updateZOrder();
     newbuilding.build();
     if (optionalBuildingIndex === undefined) {
       this.lastBuiltIndex++;
       if (this.lastBuiltIndex >= this.buildingsImages.length) this.lastBuiltIndex = 0;
     }
+  }
+
+  updateZOrder() {
+    // this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
+  }
+
+  // true if moving to front, false if back
+  // only called when selection non-null
+  moveSelectionZ(up) {
+    const { selection, buildings } = this; 
+    if (selection === null) return;
+    const fromIndex = buildings.indexOf(selection);
+    console.log('selection was at index' + fromIndex);
+    // no changes if its already at the bounds of the array
+    if ((up && fromIndex === buildings.length - 1) || (!up && fromIndex === 0)) {
+      return;
+    }
+    buildings.splice(fromIndex, 1);
+    buildings.splice(fromIndex + (up ? 1 : -1), 0, selection);
+    console.log('selection is at index' + buildings.indexOf(selection));
   }
 
   selectHouse(x, y) {
