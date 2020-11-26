@@ -21,9 +21,7 @@ for (let i = 0; i < BuildingCount; i++) {
 
 
 export class Town {
-  constructor(canvas, skyCanvas) {
-    // eslint-disable-next-line no-param-reassign
-    canvas.onselectstart = function () { return false; };
+  constructor(canvas, skyCanvas) {    
     const arr = [];
     this.buildings = arr;
     this.ctx = canvas.getContext('2d');
@@ -144,8 +142,8 @@ export class Town {
       else if (e.button === 2) self.selectHouse(x, y);
     });
 
-    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); })
-
+    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    canvas.addEventListener('selectstart', function (e) { e.preventDefault(); });
     this.update();
   }
 
@@ -245,9 +243,9 @@ export class Town {
     ctx.globalCompositeOperation = 'source-over';
 
     if (selection) {
-      ctx.strokeStyle = 'lime';
-      ctx.strokeRect(selection.x, selection.y, selection.width, selection.height);
-      ctx.strokeStyle = 'black';
+      ctx.strokeStyle = 'magenta';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(selection.x, selection.y - selection.height, selection.width, selection.height);
     }
 
     var debug = true;
@@ -310,7 +308,13 @@ export class Town {
         }
       }, i*25);
     }
-    
+  }
+  
+  saveBuildings() {
+    const l = this.buildings.length;
+    for (let i = 0; i < l; i++) {
+      console.log(this.buildings[i].toString());
+    }
   }
 
 }

@@ -29,7 +29,8 @@ const WindowSizes = {
 
 const BuildTime = 800;
 
-
+// The x,y coords are the bottom left of the building, not the top left
+// This is so buildings can be made bigger or smaller without changing the y-axis
 export class Building {
   constructor(x, y, width, height, flip, img, imgx, imgy, imgw, imgh) {
     this.x = x || 0;
@@ -46,6 +47,10 @@ export class Building {
     this.creationTime = 0; // Not yet
   }
 
+  toString() {
+    return ` { creationTime: ${this.creationTime}, finishTime: ${this.finishTime}, flip: ${this.flip}, height: ${this.height}, imgh: ${this.imgh}, imgw: ${this.imgw}, imgx: ${this.imgx}, imgy: ${this.imgy}, width: ${this.width}, x: ${this.x}, y: ${this.y} }`;
+  }
+
   build() {
     this.creationTime = Date.now();
     this.finishTime = this.creationTime + BuildTime;
@@ -54,7 +59,7 @@ export class Building {
   // return true if x,y is within bounds
   containsPoint(x, y) {
     return ((this.x <= x) && ((this.x + this.width) >= x) &&
-      (this.y <= y) && ((this.y + this.height) >= y));
+      (this.y >= y) && ((this.y - this.height) <= y));
   }
 
   // Buildings draw from their bottom center, rather than their top left corner.
