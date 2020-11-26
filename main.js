@@ -1,8 +1,6 @@
 import { Town } from './town.js';
 
 
-
-
 CanvasRenderingContext2D.prototype.lineToRand = function (x, y) {
   // this.lineTo(x, y);
   const rand = 2;

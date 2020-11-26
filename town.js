@@ -40,6 +40,9 @@ export class Town {
     this.dragStartObjectX = 0;
     this.dragStartObjectY = 0;
 
+    // debug, building by hand
+    this.currentBuildingIndex = 0; // Index of the array of buildings that click-building will build 
+
     // sky, sun, foreground
     this.skyCtx = skyCanvas.getContext('2d');
     this.skylineY = this.canvas.height / 2;
@@ -82,6 +85,25 @@ export class Town {
     this.lastBuiltIndex = 0;
 
 
+    // For debug purposes (and later optimization?) make a single array of each building
+    this.allBuildings = [];
+    const l = this.buildingsImages.length;
+    let x = 50;
+    const y = 750;
+    for (var i = 0; i < l; i++) {
+      const building = this.buildingsImages[i];
+      // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
+      const w = building.w;
+      const h = building.h;
+      // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
+      this.allBuildings.push(
+        new Building(x, y, w, h, false,
+        this.buildingsImage, building.x, building.y, building.w, building.h));
+      x += w/2;
+    }
+
+
+
     const self = this;
     canvas.addEventListener('mousedown', function (e) {
       // if (self.mode !== 'drag') return;
@@ -121,7 +143,7 @@ export class Town {
       self.setCoords(e);
       const { x, y } = self;
       console.log(x, y);
-      if (self.mode === 'build') self.buildHouse(x, y);
+      if (self.mode === 'build') self.buildHouse(x, y, self.currentBuildingIndex);
       else if (self.mode === 'select') self.selectHouse(x, y);
     });
 
@@ -139,16 +161,14 @@ export class Town {
 
   buildHouse(x, y, optionalBuildingIndex) {
     console.log(x, y);
-    let w = 80;
-    let h = 90;
     const flip = false; // Math.random() > 0.5;
     // use a sprite map of buildings
     const building = this.buildingsImages[optionalBuildingIndex || this.lastBuiltIndex];
     // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
-    w = building.w;
-    h = building.h;
+    const w = building.w;
+    const h = building.h;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
-    const newbuilding = new Building(x - (building.w/2), y - building.h, w, h, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
+    const newbuilding = new Building(x, y, w, h, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
     this.buildings.push(newbuilding);
     this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
     newbuilding.build();
@@ -176,7 +196,7 @@ export class Town {
 
   draw() {
     const {
-      buildings, ctx, canvas, selection, skylineY, sky, sun, moon, stars, foreground, skyCtx
+      buildings, ctx, canvas, selection, skylineY, sky, sun, moon, stars, foreground, skyCtx, allBuildings, currentBuildingIndex
     } = this; // wow. much destructure.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = false; // could set this once in constructor if it will never get reset
@@ -230,6 +250,24 @@ export class Town {
       ctx.strokeRect(selection.x, selection.y, selection.width, selection.height);
       ctx.strokeStyle = 'black';
     }
+
+    var debug = true;
+    if (debug) {
+      // paint all the buildings below so we can select one etc
+      const l = allBuildings.length;
+      ctx.font = '26px sans serif';
+      for (let i = 0; i < l; i++) {
+        var b = allBuildings[i];
+        b.draw(ctx);
+        ctx.fillStyle = currentBuildingIndex === i ? 'lime' : 'red';
+        ctx.fillRect(b.x, b.y, 25, 25);
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'white';
+        ctx.strokeText(i, b.x, b.y + 20);
+        ctx.fillText(i, b.x, b.y + 20);
+      }
+    }
+
   }
 
   // finds topmost object in z-order

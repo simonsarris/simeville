@@ -57,6 +57,8 @@ export class Building {
       (this.y <= y) && ((this.y + this.height) >= y));
   }
 
+  // Buildings draw from their bottom center, rather than their top left corner.
+  // This lets us adjust height etc later while maintaining their x/y positions
   draw(ctx) {
     const animating = (this.creationTime !== 0);
     let value = 1;
@@ -70,7 +72,7 @@ export class Building {
     }
 
     const { x, y, flip, img, width, height } = this;
-    ctx.translate(x, y);
+    ctx.translate(x - (width/2), y - height);
 
     // Lazy 2x pixel ratio for the buildings:
     ctx.translate(width/2, height/2);
