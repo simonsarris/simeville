@@ -35,8 +35,9 @@ export class Building {
   constructor(x, y, width, height, flip, img, imgx, imgy, imgw, imgh) {
     this.x = x || 0;
     this.y = y || 0;
-    this.width = width || 70;
-    this.height = height || 58;
+    // Caked-in assumption that buildings are 2x scale of background w.r.t. pixel density!
+    this.width = width / 2;
+    this.height = height / 2;
     this.flip = flip;
     this.img = img; // may be undefined
     this.imgx = imgx;
@@ -67,21 +68,14 @@ export class Building {
   draw(ctx) {
     const animating = (this.creationTime !== 0);
     let value = 1;
-    // let valfrac = 1;
     if (animating) {
       const elapsedTime = Date.now() - this.creationTime;
       if (elapsedTime > BuildTime) this.creationTime = 0;
       value = houseBez(elapsedTime / BuildTime); // Goes between 0 and (greater than bc of bezier) 1'
-      // console.log(value);
-      // valfrac = 1 / value;
     }
 
     const { x, y, flip, img, width, height } = this;
-    ctx.translate(x - (width/2), y - height);
-
-    // Lazy 2x pixel ratio for the buildings:
-    ctx.translate(width/2, height/2);
-    ctx.scale(0.5, 0.5);
+    ctx.translate(x, y - height);
 
     if (flip) { ctx.translate(width, 0); ctx.scale(-1, 1); }
     if (animating) {

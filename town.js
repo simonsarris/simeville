@@ -103,11 +103,17 @@ export class Town {
 
     const self = this;
     canvas.addEventListener('mousedown', function (e) {
+      if (e.button !== 2) return; // only right click right now for drags
       self.setCoords(e);
       const { x, y } = self;
-      // ehh
-      if (self.containsObject(x, y, self.sun)) self.draggedObject = self.sun;
-      if (self.containsObject(x, y, self.moon)) self.draggedObject = self.moon;
+      // ehh this could generalize better
+      if (self.containsObject(x, y, self.sun)) { self.draggedObject = self.sun; }
+      else if (self.containsObject(x, y, self.moon)) { self.draggedObject = self.moon; }
+      else { // look for buildings
+        if (e.button === 2) self.selectHouse(x, y);
+        const obj = self.findObjectAt(x, y);
+        self.draggedObject = obj;
+      }
 
       if (self.draggedObject !== null) {
         self.dragStartX = x;
@@ -133,13 +139,13 @@ export class Town {
     canvas.addEventListener('mouseup', function (e) {
       if (self.draggedObject !== null) {
         self.draggedObject = null;
-        return;
+        //return;
       }
       self.setCoords(e);
       const { x, y } = self;
       // console.log(x, y);
       if (e.button === 0) self.buildHouse(x, y, self.currentBuildingIndex);
-      else if (e.button === 2) self.selectHouse(x, y);
+      
     });
 
     canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -245,7 +251,7 @@ export class Town {
     if (selection) {
       ctx.strokeStyle = 'magenta';
       ctx.lineWidth = 3;
-      ctx.strokeRect(selection.x, selection.y - selection.height, selection.width, selection.height);
+      ctx.strokeRect(selection.x, selection.y - (selection.height), selection.width, selection.height);
     }
 
     var debug = true;
@@ -278,6 +284,8 @@ export class Town {
   }
 
   // ?? this duplicates code found in building, maybe make an entity class?
+  // big different right now in that this is used for sun and moon which have
+  // x/y coord === top left, not bottom left
   containsObject(x, y, obj) {
     return ((obj.x <= x) && ((obj.x + obj.width) >= x) &&
       (obj.y <= y) && ((obj.y + obj.height) >= y));
