@@ -29,7 +29,6 @@ export class Town {
     this.ctx = canvas.getContext('2d');
     this.canvas = canvas;
     this.selection = null;
-    this.mode = 'build'; // or 'select' or 'drag'
     this.x = 0;
     this.y = 0;
 
@@ -106,7 +105,6 @@ export class Town {
 
     const self = this;
     canvas.addEventListener('mousedown', function (e) {
-      // if (self.mode !== 'drag') return;
       self.setCoords(e);
       const { x, y } = self;
       // ehh
@@ -122,7 +120,6 @@ export class Town {
     });
 
     canvas.addEventListener('mousemove', function (e) {
-      // if (self.mode !== 'drag') return;
       if (self.draggedObject === null) return;
       self.setCoords(e);
       const { x, y } = self;
@@ -142,10 +139,12 @@ export class Town {
       }
       self.setCoords(e);
       const { x, y } = self;
-      console.log(x, y);
-      if (self.mode === 'build') self.buildHouse(x, y, self.currentBuildingIndex);
-      else if (self.mode === 'select') self.selectHouse(x, y);
+      // console.log(x, y);
+      if (e.button === 0) self.buildHouse(x, y, self.currentBuildingIndex);
+      else if (e.button === 2) self.selectHouse(x, y);
     });
+
+    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); })
 
     this.update();
   }
