@@ -22,11 +22,6 @@ CanvasRenderingContext2D.prototype.quadraticCurveToRand = function (x1, y1, x2, 
   this.fillStyle = oldStyle;
 };
 
-
-let globalWidth = 70;
-let globalHeight = 25 + 32;
-let globalWidthFraction = 0.5;
-let globalHeightFraction = 0.5;
 let town;
 function main() {
   const can = document.getElementById('town');
@@ -37,20 +32,8 @@ function main() {
   town = new Town(can, sky);
   town.draw();
   window.town = town;
-  document.getElementById('timeToBuild').addEventListener('click', function() { town.ITS_TIME_TO_BUILD(); })
-  document.getElementById('timeToLoad').addEventListener('click', function() { town.loadBuildings(); })
+  document.getElementById('timeToBuild').addEventListener('click', function() { town.loadBuildings(); });
+  document.getElementById('timeToDebug').addEventListener('click', function() { town.toggleDebug(); });
 }
 
 main();
-
-function sliderChange(e) {
-  switch (e.target.id) {
-    case 'widthSlider': globalWidth = e.target.valueAsNumber; break;
-    case 'heightSlider': globalHeight = e.target.valueAsNumber; break;
-    case 'widthFractionSlider': globalWidthFraction = e.target.valueAsNumber; break;
-    case 'heightFractionSlider': globalHeightFraction = e.target.valueAsNumber; break;
-  }
-  if (town && town.selection) {
-    town.selection.updateValues(globalWidth, globalHeight, globalWidthFraction, globalHeightFraction);
-  }
-}

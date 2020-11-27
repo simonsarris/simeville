@@ -1,0 +1,25 @@
+{
+  "name": "simeville",
+  "version": "1.0.0",
+  "description": "This is meant to be the background to [simonsarris.com](https://simonsarris.com), once it looks nice. The current [simonsarris.com](https://simonsarris.com) is a pure CSS background (including the birds) but is not interactive.",
+  "main": "main.js",
+  "dependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "serve": "browser-sync start --server --files \"*.html, *.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonsarris/simeville.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/simonsarris/simeville/issues"
+  },
+  "homepage": "https://github.com/simonsarris/simeville#readme"
+}

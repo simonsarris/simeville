@@ -1,6 +1,6 @@
+/* eslint-disable radix */
 
 import { Building } from './building.js';
-import { randomInt, random } from './util.js';
 
 const SceneWidth = 1600;
 const SceneHeight = 880;
@@ -21,7 +21,7 @@ for (let i = 0; i < BuildingCount; i++) {
 
 
 export class Town {
-  constructor(canvas, skyCanvas) {    
+  constructor(canvas, skyCanvas) {
     const arr = [];
     this.buildings = arr;
     this.ctx = canvas.getContext('2d');
@@ -38,7 +38,7 @@ export class Town {
     this.dragStartObjectY = 0;
 
     // debug, building by hand
-    this.currentBuildingIndex = 0; // Index of the array of buildings that click-building will build 
+    this.currentBuildingIndex = 0; // Index of the array of buildings that click-building will build
 
     // sky, sun, foreground
     this.skyCtx = skyCanvas.getContext('2d');
@@ -87,16 +87,17 @@ export class Town {
     const l = this.buildingsImages.length;
     let x = 50;
     const y = 750;
-    for (var i = 0; i < l; i++) {
+    for (let i = 0; i < l; i++) {
       const building = this.buildingsImages[i];
       // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
-      const w = building.w;
-      const h = building.h;
+      const { w } = building;
+      const { h } = building;
       // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
       this.allBuildings.push(
-        new Building(x, y, w/2, h/2, false,
-        this.buildingsImage, building.x, building.y, building.w, building.h));
-      x += w/2;
+        new Building(x, y, w / 2, h / 2, false,
+          this.buildingsImage, building.x, building.y, building.w, building.h)
+      );
+      x += w / 2;
     }
 
 
@@ -107,9 +108,7 @@ export class Town {
       self.setCoords(e);
       const { x, y } = self;
       // ehh this could generalize better
-      if (self.containsObject(x, y, self.sun)) { self.draggedObject = self.sun; }
-      else if (self.containsObject(x, y, self.moon)) { self.draggedObject = self.moon; }
-      else { // look for buildings
+      if (self.containsObject(x, y, self.sun)) { self.draggedObject = self.sun; } else if (self.containsObject(x, y, self.moon)) { self.draggedObject = self.moon; } else { // look for buildings
         if (e.button === 2) self.selectHouse(x, y);
         const obj = self.findObjectAt(x, y);
         self.draggedObject = obj;
@@ -154,13 +153,13 @@ export class Town {
         self.draw();
       } else if (e.key.match('[1-9]') !== null) {
         self.currentBuildingIndex = parseInt(e.key);
-      } else if (e.key === "ArrowRight") {
+      } else if (e.key === 'ArrowRight') {
         self.currentBuildingIndex++;
-      } else if (e.key === "ArrowLeft") {
+      } else if (e.key === 'ArrowLeft') {
         self.currentBuildingIndex--;
-      } else if (e.key === "ArrowUp") { // are you regetting that this isn't a switch statement yet?
+      } else if (e.key === 'ArrowUp') { // are you regetting that this isn't a switch statement yet?
         self.moveSelectionZ(true);
-      } else if (e.key === "ArrowDown") {
+      } else if (e.key === 'ArrowDown') {
         self.moveSelectionZ(false);
       }
     });
@@ -184,10 +183,10 @@ export class Town {
     // use a sprite map of buildings
     const building = this.buildingsImages[optionalBuildingIndex || this.lastBuiltIndex];
     // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
-    const w = building.w;
-    const h = building.h;
+    const { w } = building;
+    const { h } = building;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
-    const newbuilding = new Building(x, y, w/2, h/2, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
+    const newbuilding = new Building(x, y, w / 2, h / 2, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
     this.buildings.unshift(newbuilding);
     // before we'd automatically pick a z order based on:
     // this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
@@ -202,17 +201,17 @@ export class Town {
   // true if moving to front, false if back
   // only called when selection non-null
   moveSelectionZ(up) {
-    const { selection, buildings } = this; 
+    const { selection, buildings } = this;
     if (selection === null) return;
     const fromIndex = buildings.indexOf(selection);
-    console.log('selection was at index' + fromIndex);
+    console.log(`selection was at index${fromIndex}`);
     // no changes if its already at the bounds of the array
     if ((up && fromIndex === buildings.length - 1) || (!up && fromIndex === 0)) {
       return;
     }
     buildings.splice(fromIndex, 1);
     buildings.splice(fromIndex + (up ? 1 : -1), 0, selection);
-    console.log('selection is at index' + buildings.indexOf(selection));
+    console.log(`selection is at index${buildings.indexOf(selection)}`);
   }
 
   selectHouse(x, y) {
@@ -268,7 +267,7 @@ export class Town {
     skyCtx.globalAlpha = 1;
 
     // Buildings
-    const l = buildings.length;
+    let l = buildings.length;
     for (let i = 0; i < l; i++) {
       buildings[i].draw(ctx);
     }
@@ -288,13 +287,13 @@ export class Town {
       ctx.strokeRect(selection.x, selection.y - (selection.height), selection.width, selection.height);
     }
 
-    var debug = true;
+    const debug = true;
     if (debug) {
       // paint all the buildings below so we can select one etc
-      const l = allBuildings.length;
+      l = allBuildings.length;
       ctx.font = '26px sans serif';
       for (let i = 0; i < l; i++) {
-        var b = allBuildings[i];
+        const b = allBuildings[i];
         b.draw(ctx);
         ctx.fillStyle = currentBuildingIndex === i ? 'lime' : 'red';
         ctx.fillRect(b.x, b.y, 25, 25);
@@ -304,7 +303,6 @@ export class Town {
         ctx.fillText(i, b.x, b.y + 20);
       }
     }
-
   }
 
   // finds topmost object in z-order
@@ -326,32 +324,32 @@ export class Town {
   }
 
 
-  // Create a bunch of buildings and animate them in sequence
-  ITS_TIME_TO_BUILD() {
-    // it's time to randomize the building order:
-    for(let i = TownBuildings.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * i)
-      const temp = TownBuildings[i]
-      TownBuildings[i] = TownBuildings[j]
-      TownBuildings[j] = temp
-    }
-    const smallHouses = [0, 4, 8, 9, 10];
+  // // Create a bunch of buildings and animate them in sequence
+  // ITS_TIME_TO_BUILD() {
+  //   // it's time to randomize the building order:
+  //   for (let i = TownBuildings.length - 1; i > 0; i--) {
+  //     const j = Math.floor(Math.random() * i);
+  //     const temp = TownBuildings[i];
+  //     TownBuildings[i] = TownBuildings[j];
+  //     TownBuildings[j] = temp;
+  //   }
+  //   const smallHouses = [0, 4, 8, 9, 10];
 
-    for (var i = 0; i < TownBuildings.length; i ++) {
-      const building = TownBuildings[i];
-      const self = this;
-      let heightAdjustment = i / 2;
-      setTimeout(function() {
-        if (Math.random() < 0.8) {
-          var buildingType = smallHouses[Math.floor(Math.random() * smallHouses.length)];
-          self.buildHouse(building.x, building.y - heightAdjustment, buildingType);
-        } else {
-          self.buildHouse(building.x, building.y - heightAdjustment);
-        }
-      }, i*25);
-    }
-  }
-  
+  //   for (let i = 0; i < TownBuildings.length; i++) {
+  //     const building = TownBuildings[i];
+  //     const self = this;
+  //     const heightAdjustment = i / 2;
+  //     setTimeout(function() {
+  //       if (Math.random() < 0.8) {
+  //         const buildingType = smallHouses[Math.floor(Math.random() * smallHouses.length)];
+  //         self.buildHouse(building.x, building.y - heightAdjustment, buildingType);
+  //       } else {
+  //         self.buildHouse(building.x, building.y - heightAdjustment);
+  //       }
+  //     }, i * 25);
+  //   }
+  // }
+
   saveBuildings() {
     const l = this.buildings.length;
     for (let i = 0; i < l; i++) {
@@ -360,7 +358,7 @@ export class Town {
   }
 
   loadBuildings() {
-    this.buildings =[
+    this.buildings = [
       new Building(509, 328, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
       new Building(630, 291, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
       new Building(1, 364, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
@@ -430,32 +428,31 @@ export class Town {
       new Building(1130, 370, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
       new Building(703, 342, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
       new Building(785, 351, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86)
-      
-  //  new Building(93,   341, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-  //  new Building(61,   355, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-  //  new Building(115,  343, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-  //  new Building(204,  325, 55,   192.5, false, this.buildingsImage, 265,  213, 110, 385),
-  //  new Building(382,  384, 47.5, 87, false, this.buildingsImage,    28,   415, 95,  174),
-  //  new Building(230,  363, 80,   146.5, false, this.buildingsImage, 895,  305, 160, 293),
-  //  new Building(261,  370, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
-  //  new Building(1222, 319, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-  //  new Building(1299, 305, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-  //  new Building(1253, 325, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-  //  new Building(1273, 339, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-  //  new Building(1194, 351, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-  //  new Building(1303, 353, 94,   83.5, false, this.buildingsImage,  2474, 431, 188, 167),
-  //  new Building(1091, 359, 56.5, 149, false, this.buildingsImage,   2335, 290, 113, 298),
-  //  new Building(902,  353, 57.5, 163, false, this.buildingsImage,   143,  271, 115, 326),
-  //  new Building(152,  341, 49.5, 98.5, false, this.buildingsImage,  407,  398, 99,  197),
-  //  new Building(172,  343, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
-  //  new Building(494,  376, 77.5, 88.5, false, this.buildingsImage,  1095, 416, 155, 177),
-  //  new Building(1130, 370, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-  //  new Building(696,  337, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-  //  new Building(785,  351, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-  //  new Building(301,  380, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 )
-  ]
-  }
 
+      //  new Building(93,   341, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+      //  new Building(61,   355, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+      //  new Building(115,  343, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+      //  new Building(204,  325, 55,   192.5, false, this.buildingsImage, 265,  213, 110, 385),
+      //  new Building(382,  384, 47.5, 87, false, this.buildingsImage,    28,   415, 95,  174),
+      //  new Building(230,  363, 80,   146.5, false, this.buildingsImage, 895,  305, 160, 293),
+      //  new Building(261,  370, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
+      //  new Building(1222, 319, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+      //  new Building(1299, 305, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+      //  new Building(1253, 325, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+      //  new Building(1273, 339, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+      //  new Building(1194, 351, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+      //  new Building(1303, 353, 94,   83.5, false, this.buildingsImage,  2474, 431, 188, 167),
+      //  new Building(1091, 359, 56.5, 149, false, this.buildingsImage,   2335, 290, 113, 298),
+      //  new Building(902,  353, 57.5, 163, false, this.buildingsImage,   143,  271, 115, 326),
+      //  new Building(152,  341, 49.5, 98.5, false, this.buildingsImage,  407,  398, 99,  197),
+      //  new Building(172,  343, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
+      //  new Building(494,  376, 77.5, 88.5, false, this.buildingsImage,  1095, 416, 155, 177),
+      //  new Building(1130, 370, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+      //  new Building(696,  337, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+      //  new Building(785,  351, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+      //  new Building(301,  380, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 )
+    ];
+  }
 }
 
 
