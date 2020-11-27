@@ -36,8 +36,8 @@ export class Building {
     this.x = x || 0;
     this.y = y || 0;
     // Caked-in assumption that buildings are 2x scale of background w.r.t. pixel density!
-    this.width = width / 2;
-    this.height = height / 2;
+    this.width = width// / 2;
+    this.height = height /// 2;
     this.flip = flip;
     this.img = img; // may be undefined
     this.imgx = imgx;
@@ -49,7 +49,8 @@ export class Building {
   }
 
   toString() {
-    return ` { creationTime: ${this.creationTime}, finishTime: ${this.finishTime}, flip: ${this.flip}, height: ${this.height}, imgh: ${this.imgh}, imgw: ${this.imgw}, imgx: ${this.imgx}, imgy: ${this.imgy}, width: ${this.width}, x: ${this.x}, y: ${this.y} }`;
+    return `${this.x}, ${this.y}, ${this.width}, ${this.height}, false, undefined, ${this.imgx}, ${this.imgy}, ${this.imgw}, ${this.imgh}`;
+    // return ` { creationTime: ${this.creationTime}, finishTime: ${this.finishTime}, flip: ${this.flip}, height: ${this.height}, imgh: ${this.imgh}, imgw: ${this.imgw}, imgx: ${this.imgx}, imgy: ${this.imgy}, width: ${this.width}, x: ${this.x}, y: ${this.y} }`;
   }
 
   build() {

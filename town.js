@@ -94,7 +94,7 @@ export class Town {
       const h = building.h;
       // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
       this.allBuildings.push(
-        new Building(x, y, w, h, false,
+        new Building(x, y, w/2, h/2, false,
         this.buildingsImage, building.x, building.y, building.w, building.h));
       x += w/2;
     }
@@ -146,7 +146,7 @@ export class Town {
       self.setCoords(e);
       const { x, y } = self;
       // console.log(x, y);
-      if (e.button === 0) self.buildHouse(x, y, self.currentBuildingIndex);
+      if (e.button === 0) self.buildHouse(x | 0, y | 0, self.currentBuildingIndex);
       
     });
 
@@ -191,9 +191,10 @@ export class Town {
     const w = building.w;
     const h = building.h;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
-    const newbuilding = new Building(x, y, w, h, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
+    const newbuilding = new Building(x, y, w/2, h/2, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
     this.buildings.unshift(newbuilding);
-    this.updateZOrder();
+    // before we'd automatically pick a z order based on:
+    // this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
     newbuilding.build();
     if (optionalBuildingIndex === undefined) {
       this.lastBuiltIndex++;
@@ -201,9 +202,6 @@ export class Town {
     }
   }
 
-  updateZOrder() {
-    // this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
-  }
 
   // true if moving to front, false if back
   // only called when selection non-null
@@ -363,6 +361,103 @@ export class Town {
     for (let i = 0; i < l; i++) {
       console.log(this.buildings[i].toString());
     }
+  }
+
+  loadBuildings() {
+    this.buildings =[
+      new Building(509.1269841269842, 328.92376681614354, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
+      new Building(630.2857142857143, 291.6547085201794, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
+      new Building(1.2380952380952408, 364.6502242152466, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
+      new Building(1446.015873015873, 364.70403587443946, 55, 80, false, this.buildingsImage, 1552, 438, 110, 160),
+      new Building(47, 348.9192825112107, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
+      new Building(1079.095238095238, 364.762331838565, 80, 146.5, false, this.buildingsImage, 895, 305, 160, 293),
+      new Building(922.6190476190476, 327.43946188340806, 145, 296.5, false, this.buildingsImage, 1748, 0, 290, 593),
+      new Building(1314.7460317460318, 321.08520179372204, 30, 166, false, this.buildingsImage, 2108, 262, 60, 332),
+      new Building(465.36507936507934, 336.52017937219733, 30.5, 199.5, false, this.buildingsImage, 808, 195, 61, 399),
+      new Building(319.2063492063492, 324.8161434977578, 55.5, 210, false, this.buildingsImage, 678, 173, 111, 420),
+      new Building(366.80952380952385, 316.97757847533626, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
+      new Building(287.1269841269841, 301.5156950672646, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(339.23809523809524, 325.30044843049325, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(299.1746031746032, 324.7578475336323, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(378.55555555555554, 338.6502242152466, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(325.23809523809524, 375.86995515695065, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
+      new Building(469.2539682539682, 356.8161434977579, 55, 80, false, this.buildingsImage, 1552, 438, 110, 160),
+      new Building(613.0952380952381, 305.5695067264574, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(761.1587301587301, 315.5156950672645, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(700.2857142857143, 259.78026905829597, 49.5, 98.5, false, this.buildingsImage, 407, 398, 99, 197),
+      new Building(690, 319, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
+      new Building(813.031746031746, 334.62331838565024, 55, 192.5, false, this.buildingsImage, 265, 213, 110, 385),
+      new Building(794.9206349206348, 324.94618834080717, 47.5, 87, false, this.buildingsImage, 28, 415, 95, 174),
+      new Building(634.0952380952381, 326.75784753363223, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
+      new Building(678.0793650793651, 331.10762331838566, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(736.1111111111111, 364.677130044843, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
+      new Building(1372.111111111111, 338.9730941704036, 55, 192.5, false, this.buildingsImage, 265, 213, 110, 385),
+      new Building(1180.1746031746034, 346.67713004484307, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
+      new Building(1406.126984126984, 366.8116591928251, 49.5, 98.5, false, this.buildingsImage, 407, 398, 99, 197),
+      new Building(835, 331, 47.5, 87, false, this.buildingsImage, 28, 415, 95, 174),
+      new Building(337.1746031746032, 364.8116591928251, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(863.015873015873, 330.8116591928251, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1126.079365079365, 348.8116591928251, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
+      new Building(1005.2698412698412, 320.9461883408072, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
+      new Building(940.047619047619, 328.97309417040356, 55, 80, false, this.buildingsImage, 1552, 438, 110, 160),
+      new Building(962, 320.89237668161434, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1041, 347, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1039, 357, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(988, 329, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(113, 327, 56.5, 149, false, this.buildingsImage, 2335, 290, 113, 298),
+      new Building(551.2698412698412, 356.26905829596416, 80, 146.5, false, this.buildingsImage, 895, 305, 160, 293),
+      new Building(601.0793650793652, 372.0269058295964, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
+      new Building(561.031746031746, 361, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(613.063492063492, 371.94618834080717, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(1234, 327, 30.5, 199.5, false, this.buildingsImage, 808, 195, 61, 399),
+      new Building(430, 365, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
+      new Building(412.1111111111111, 370.89237668161434, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
+      new Building(93, 341, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(61, 355, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(115, 343, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(204, 325, 55, 192.5, false, this.buildingsImage, 265, 213, 110, 385),
+      new Building(385.968253968254, 385.97309417040356, 47.5, 87, false, this.buildingsImage, 28, 415, 95, 174),
+      new Building(230, 363, 80, 146.5, false, this.buildingsImage, 895, 305, 160, 293),
+      new Building(261, 370, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
+      new Building(1222, 319, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1299, 305, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1253, 325, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1273, 339, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1194, 351, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(1303, 353, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
+      new Building(1091, 359, 56.5, 149, false, this.buildingsImage, 2335, 290, 113, 298),
+      new Building(902, 353, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
+      new Building(152, 341, 49.5, 98.5, false, this.buildingsImage, 407, 398, 99, 197),
+      new Building(172, 343, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
+      new Building(353.1269841269841, 376.7309417040359, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
+      new Building(494, 376, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
+      new Building(1130, 370, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(703.936507936508, 342.9192825112108, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
+      new Building(785, 351, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86)
+      
+  //  new Building(93,   341, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+  //  new Building(61,   355, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+  //  new Building(115,  343, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+  //  new Building(204,  325, 55,   192.5, false, this.buildingsImage, 265,  213, 110, 385),
+  //  new Building(382,  384, 47.5, 87, false, this.buildingsImage,    28,   415, 95,  174),
+  //  new Building(230,  363, 80,   146.5, false, this.buildingsImage, 895,  305, 160, 293),
+  //  new Building(261,  370, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
+  //  new Building(1222, 319, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+  //  new Building(1299, 305, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+  //  new Building(1253, 325, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+  //  new Building(1273, 339, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+  //  new Building(1194, 351, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+  //  new Building(1303, 353, 94,   83.5, false, this.buildingsImage,  2474, 431, 188, 167),
+  //  new Building(1091, 359, 56.5, 149, false, this.buildingsImage,   2335, 290, 113, 298),
+  //  new Building(902,  353, 57.5, 163, false, this.buildingsImage,   143,  271, 115, 326),
+  //  new Building(152,  341, 49.5, 98.5, false, this.buildingsImage,  407,  398, 99,  197),
+  //  new Building(172,  343, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
+  //  new Building(494,  376, 77.5, 88.5, false, this.buildingsImage,  1095, 416, 155, 177),
+  //  new Building(1130, 370, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+  //  new Building(696,  337, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
+  //  new Building(785,  351, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
+  //  new Building(301,  380, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 )
+  ]
   }
 
 }

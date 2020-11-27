@@ -38,6 +38,7 @@ function main() {
   town.draw();
   window.town = town;
   document.getElementById('timeToBuild').addEventListener('click', function() { town.ITS_TIME_TO_BUILD(); })
+  document.getElementById('timeToLoad').addEventListener('click', function() { town.loadBuildings(); })
 }
 
 main();
