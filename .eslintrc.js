@@ -15,6 +15,7 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
+    'linebreak-style': 0,
     'no-multiple-empty-lines': 0,
     'func-names': 0,
     'prefer-arrow-callback': 0,

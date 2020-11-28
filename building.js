@@ -2,42 +2,17 @@ import bezier from './easing.js';
 
 const houseBez = bezier(0.00, 0.75, 0.29, 1.4);
 
-// eslint-disable-next-line no-unused-vars
-const Colors = {
-  lightHouse: '#DDCDB2',
-  darkHouse: '#DDCDB2',
-  background: '#DDCDB2',
-  redroof: '#DDCDB2',
-  greenroof: '#DDCDB2',
-};
-
-// const Colors = {
-//   lightHouse: '#f5f5f5',
-//   darkHouse: '#DCDCDC',
-//   background: '#e2d8ce',
-//   redroof: '#d15d34',
-//   greenroof: '#bdac36',
-// };
-
-
-
-
-const WindowSizes = {
-  small: 3,
-  big: 5,
-};
-
-const BuildTime = 800;
+const BuildTime = 1200;
 
 // The x,y coords are the bottom left of the building, not the top left
 // This is so buildings can be made bigger or smaller without changing the y-axis
 export class Building {
-  constructor(x, y, width, height, flip, img, imgx, imgy, imgw, imgh) {
+  constructor(x, y, width, height, flip, img, imgx, imgy, imgw, imgh, delay) {
     this.x = x || 0;
     this.y = y || 0;
     // Caked-in assumption that buildings are 2x scale of background w.r.t. pixel density!
-    this.width = width// / 2;
-    this.height = height /// 2;
+    this.width = width;
+    this.height = height;
     this.flip = flip;
     this.img = img; // may be undefined
     this.imgx = imgx;
@@ -46,6 +21,7 @@ export class Building {
     this.imgh = imgh;
     // Animation:
     this.creationTime = 0; // Not yet
+    this.delay = delay || 0;
   }
 
   toString() {
@@ -54,7 +30,7 @@ export class Building {
   }
 
   build() {
-    this.creationTime = Date.now();
+    this.creationTime = Date.now() + this.delay;
     this.finishTime = this.creationTime + BuildTime;
   }
 
@@ -71,6 +47,7 @@ export class Building {
     let value = 1;
     if (animating) {
       const elapsedTime = Date.now() - this.creationTime;
+      if (elapsedTime < 0) return; // still have some delay, first
       if (elapsedTime > BuildTime) this.creationTime = 0;
       value = houseBez(elapsedTime / BuildTime); // Goes between 0 and (greater than bc of bezier) 1'
     }
@@ -84,9 +61,9 @@ export class Building {
       ctx.scale(value, value);
     }
 
-    
+
     if (this.imgx) {
-      ctx.drawImage(img,  this.imgx, this.imgy, this.imgw, this.imgh, 0, 0, width, height);
+      ctx.drawImage(img, this.imgx, this.imgy, this.imgw, this.imgh, 0, 0, width, height);
     } else {
       ctx.drawImage(img, 0, 0, width, height); // NYI
     }
@@ -99,8 +76,6 @@ export class Building {
     // if (flip) { ctx.scale(-1, 1); ctx.translate(-w, 0); }
     // ctx.translate(-x, -y);
   } // end draw
-
-
 } // end class
 
 export default Building;

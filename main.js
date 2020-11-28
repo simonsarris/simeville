@@ -33,7 +33,7 @@ function main() {
   town.draw();
   window.town = town;
   document.getElementById('timeToBuild').addEventListener('click', function() { town.loadBuildings(); });
-  document.getElementById('timeToDebug').addEventListener('click', function() { town.toggleDebug(); });
+  document.getElementById('timeToDebug').addEventListener('click', function() { window.debug = !window.debug; });
 }
 
 main();

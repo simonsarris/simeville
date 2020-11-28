@@ -16,8 +16,8 @@
     "type": "git",
     "url": "git+https://github.com/simonsarris/simeville.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Simon Sarris",
+  "license": "",
   "bugs": {
     "url": "https://github.com/simonsarris/simeville/issues"
   },

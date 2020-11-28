@@ -30,6 +30,8 @@ export class Town {
     this.x = 0;
     this.y = 0;
 
+    this.totalTimeout = 0;
+
     // dragging. draggedObject doubles as state, null = no drag ongoing
     this.draggedObject = null;
     this.dragStartX = 0;
@@ -104,12 +106,13 @@ export class Town {
 
     const self = this;
     canvas.addEventListener('mousedown', function (e) {
-      if (e.button !== 2) return; // only right click right now for drags
+      if (e.button !== 0) return; // only left click drags for now
       self.setCoords(e);
+      // eslint-disable-next-line no-shadow
       const { x, y } = self;
       // ehh this could generalize better
       if (self.containsObject(x, y, self.sun)) { self.draggedObject = self.sun; } else if (self.containsObject(x, y, self.moon)) { self.draggedObject = self.moon; } else { // look for buildings
-        if (e.button === 2) self.selectHouse(x, y);
+        if (e.button === 0) self.selectHouse(x, y);
         const obj = self.findObjectAt(x, y);
         self.draggedObject = obj;
       }
@@ -125,6 +128,7 @@ export class Town {
     canvas.addEventListener('mousemove', function (e) {
       if (self.draggedObject === null) return;
       self.setCoords(e);
+      // eslint-disable-next-line no-shadow
       const { x, y } = self;
       self.draggedObject.x = self.dragStartObjectX - (self.dragStartX - x);
       self.draggedObject.y = self.dragStartObjectY - (self.dragStartY - y);
@@ -141,8 +145,9 @@ export class Town {
         self.draw();
       }
       self.setCoords(e);
+      // eslint-disable-next-line no-shadow
       const { x, y } = self;
-      if (e.button === 0) self.buildHouse(x | 0, y | 0, self.currentBuildingIndex);
+      if (e.button === 2) self.buildHouse(x | 0, y | 0, self.currentBuildingIndex);
     });
 
     canvas.addEventListener('keydown', function(e) {
@@ -177,24 +182,27 @@ export class Town {
     this.y = (e.clientY - box.top) * (can.height / box.height);
   }
 
-  buildHouse(x, y, optionalBuildingIndex) {
-    console.log(x, y);
-    const flip = false; // Math.random() > 0.5;
+  buildHouse(x, y, buildingIndex) {
+    // Lazy way of building in the right order right now is to delay
+    // the houses starting with the *most* delay for the last houses
+    // Since the z-order of building is approx reverse the building order
+    // I should fix this maybe by stuffing them in another array or something
+    const timeout = this.totalTimeout;
+    this.totalTimeout -= 105; // corresponds to bullshit magic number in load
+    if (this.totalTimeout < 0) this.totalTimeout = 0; // blah this is because I'm only approximating the total delay needed and counting downwards
+    const self = this;
+    const flip = false; // make optional param
     // use a sprite map of buildings
-    const building = this.buildingsImages[optionalBuildingIndex || this.lastBuiltIndex];
+    const building = self.buildingsImages[buildingIndex];
     // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
-    const { w } = building;
-    const { h } = building;
+    const { w, h } = building;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
-    const newbuilding = new Building(x, y, w / 2, h / 2, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
-    this.buildings.unshift(newbuilding);
-    // before we'd automatically pick a z order based on:
-    // this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
-    newbuilding.build();
-    if (optionalBuildingIndex === undefined) {
-      this.lastBuiltIndex++;
-      if (this.lastBuiltIndex >= this.buildingsImages.length) this.lastBuiltIndex = 0;
-    }
+    const newbuilding = new Building(
+      x, y, w / 2, h / 2, flip, self.buildingsImage,
+      building.x, building.y, w, h, timeout
+    );
+    self.buildings.push(newbuilding);
+    newbuilding.build(); // should this just happen automatically?
   }
 
 
@@ -287,8 +295,7 @@ export class Town {
       ctx.strokeRect(selection.x, selection.y - (selection.height), selection.width, selection.height);
     }
 
-    const debug = true;
-    if (debug) {
+    if (window.debug) {
       // paint all the buildings below so we can select one etc
       l = allBuildings.length;
       ctx.font = '26px sans serif';
@@ -358,100 +365,76 @@ export class Town {
   }
 
   loadBuildings() {
-    this.buildings = [
-      new Building(509, 328, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
-      new Building(630, 291, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
-      new Building(1, 364, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
-      new Building(1446, 364, 55, 80, false, this.buildingsImage, 1552, 438, 110, 160),
-      new Building(47, 348, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
-      new Building(1079, 364, 80, 146.5, false, this.buildingsImage, 895, 305, 160, 293),
-      new Building(922, 327, 145, 296.5, false, this.buildingsImage, 1748, 0, 290, 593),
-      new Building(1314, 321, 30, 166, false, this.buildingsImage, 2108, 262, 60, 332),
-      new Building(465, 336, 30.5, 199.5, false, this.buildingsImage, 808, 195, 61, 399),
-      new Building(319, 324, 55.5, 210, false, this.buildingsImage, 678, 173, 111, 420),
-      new Building(366, 316, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
-      new Building(287, 301, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(339, 325, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(299, 324, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(378, 338, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(325, 375, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
-      new Building(469, 356, 55, 80, false, this.buildingsImage, 1552, 438, 110, 160),
-      new Building(613, 305, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(761, 315, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(700, 259, 49.5, 98.5, false, this.buildingsImage, 407, 398, 99, 197),
-      new Building(690, 319, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
-      new Building(813, 334, 55, 192.5, false, this.buildingsImage, 265, 213, 110, 385),
-      new Building(794, 324, 47.5, 87, false, this.buildingsImage, 28, 415, 95, 174),
-      new Building(634, 326, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
-      new Building(678, 331, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(736, 364, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
-      new Building(1372, 338, 55, 192.5, false, this.buildingsImage, 265, 213, 110, 385),
-      new Building(1180, 346, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
-      new Building(1406, 366, 49.5, 98.5, false, this.buildingsImage, 407, 398, 99, 197),
-      new Building(835, 331, 47.5, 87, false, this.buildingsImage, 28, 415, 95, 174),
-      new Building(337, 364, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(863, 330, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1126, 348, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
-      new Building(1005, 320, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
-      new Building(940, 328, 55, 80, false, this.buildingsImage, 1552, 438, 110, 160),
-      new Building(962, 320, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1041, 347, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1039, 357, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(988, 329, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(113, 327, 56.5, 149, false, this.buildingsImage, 2335, 290, 113, 298),
-      new Building(551, 356, 80, 146.5, false, this.buildingsImage, 895, 305, 160, 293),
-      new Building(601, 372, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
-      new Building(561, 361, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(613, 371, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(1234, 327, 30.5, 199.5, false, this.buildingsImage, 808, 195, 61, 399),
-      new Building(430, 365, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
-      new Building(412, 370, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
-      new Building(93, 341, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(61, 355, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(115, 343, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(204, 325, 55, 192.5, false, this.buildingsImage, 265, 213, 110, 385),
-      new Building(385, 385, 47.5, 87, false, this.buildingsImage, 28, 415, 95, 174),
-      new Building(230, 363, 80, 146.5, false, this.buildingsImage, 895, 305, 160, 293),
-      new Building(261, 370, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
-      new Building(1222, 319, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1299, 305, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1253, 325, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1273, 339, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1194, 351, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(1303, 353, 94, 83.5, false, this.buildingsImage, 2474, 431, 188, 167),
-      new Building(1091, 359, 56.5, 149, false, this.buildingsImage, 2335, 290, 113, 298),
-      new Building(902, 353, 57.5, 163, false, this.buildingsImage, 143, 271, 115, 326),
-      new Building(152, 341, 49.5, 98.5, false, this.buildingsImage, 407, 398, 99, 197),
-      new Building(172, 343, 82.5, 72.5, false, this.buildingsImage, 512, 452, 165, 145),
-      new Building(353, 376, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86),
-      new Building(494, 376, 77.5, 88.5, false, this.buildingsImage, 1095, 416, 155, 177),
-      new Building(1130, 370, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(703, 342, 58.5, 48.5, false, this.buildingsImage, 1401, 479, 117, 97),
-      new Building(785, 351, 56, 43, false, this.buildingsImage, 1275, 504, 112, 86)
-
-      //  new Building(93,   341, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-      //  new Building(61,   355, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-      //  new Building(115,  343, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-      //  new Building(204,  325, 55,   192.5, false, this.buildingsImage, 265,  213, 110, 385),
-      //  new Building(382,  384, 47.5, 87, false, this.buildingsImage,    28,   415, 95,  174),
-      //  new Building(230,  363, 80,   146.5, false, this.buildingsImage, 895,  305, 160, 293),
-      //  new Building(261,  370, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
-      //  new Building(1222, 319, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-      //  new Building(1299, 305, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-      //  new Building(1253, 325, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-      //  new Building(1273, 339, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-      //  new Building(1194, 351, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-      //  new Building(1303, 353, 94,   83.5, false, this.buildingsImage,  2474, 431, 188, 167),
-      //  new Building(1091, 359, 56.5, 149, false, this.buildingsImage,   2335, 290, 113, 298),
-      //  new Building(902,  353, 57.5, 163, false, this.buildingsImage,   143,  271, 115, 326),
-      //  new Building(152,  341, 49.5, 98.5, false, this.buildingsImage,  407,  398, 99,  197),
-      //  new Building(172,  343, 82.5, 72.5, false, this.buildingsImage,  512,  452, 165, 145),
-      //  new Building(494,  376, 77.5, 88.5, false, this.buildingsImage,  1095, 416, 155, 177),
-      //  new Building(1130, 370, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-      //  new Building(696,  337, 58.5, 48.5, false, this.buildingsImage,  1401, 479, 117, 97 ),
-      //  new Building(785,  351, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 ),
-      //  new Building(301,  380, 56,   43, false, this.buildingsImage,    1275, 504, 112, 86 )
-    ];
+    this.totalTimeout = 70 * 105;
+    this.buildHouse(509, 328, 4);
+    this.buildHouse(630, 291, 1);
+    this.buildHouse(1, 364, 15);
+    this.buildHouse(1446, 364, 11);
+    this.buildHouse(47, 348, 4);
+    this.buildHouse(1079, 364, 7);
+    this.buildHouse(922, 327, 12);
+    this.buildHouse(1314, 321, 13);
+    this.buildHouse(465, 336, 6);
+    this.buildHouse(319, 324, 5);
+    this.buildHouse(366, 316, 8);
+    this.buildHouse(287, 301, 10);
+    this.buildHouse(339, 325, 10);
+    this.buildHouse(299, 324, 10);
+    this.buildHouse(378, 338, 10);
+    this.buildHouse(325, 375, 15);
+    this.buildHouse(469, 356, 11);
+    this.buildHouse(613, 305, 10);
+    this.buildHouse(761, 315, 10);
+    this.buildHouse(700, 259, 3);
+    this.buildHouse(690, 319, 8);
+    this.buildHouse(813, 334, 2);
+    this.buildHouse(794, 324, 0);
+    this.buildHouse(634, 326, 4);
+    this.buildHouse(678, 331, 10);
+    this.buildHouse(736, 364, 15);
+    this.buildHouse(1372, 338, 2);
+    this.buildHouse(1180, 346, 1);
+    this.buildHouse(1406, 366, 3);
+    this.buildHouse(835, 331, 0);
+    this.buildHouse(337, 364, 9);
+    this.buildHouse(863, 330, 10);
+    this.buildHouse(1126, 348, 4);
+    this.buildHouse(1005, 320, 8);
+    this.buildHouse(940, 328, 11);
+    this.buildHouse(962, 320, 10);
+    this.buildHouse(1041, 347, 10);
+    this.buildHouse(1039, 357, 10);
+    this.buildHouse(988, 329, 9);
+    this.buildHouse(113, 327, 14);
+    this.buildHouse(551, 356, 7);
+    this.buildHouse(601, 372, 15);
+    this.buildHouse(561, 361, 9);
+    this.buildHouse(613, 371, 9);
+    this.buildHouse(1234, 327, 6);
+    this.buildHouse(430, 365, 1);
+    this.buildHouse(412, 370, 4);
+    this.buildHouse(93, 341, 9);
+    this.buildHouse(61, 355, 9);
+    this.buildHouse(115, 343, 9);
+    this.buildHouse(204, 325, 2);
+    this.buildHouse(385, 385, 0);
+    this.buildHouse(230, 363, 7);
+    this.buildHouse(261, 370, 4);
+    this.buildHouse(1222, 319, 10);
+    this.buildHouse(1299, 305, 10);
+    this.buildHouse(1253, 325, 10);
+    this.buildHouse(1273, 339, 10);
+    this.buildHouse(1194, 351, 10);
+    this.buildHouse(1303, 353, 15);
+    this.buildHouse(1091, 359, 14);
+    this.buildHouse(902, 353, 1);
+    this.buildHouse(152, 341, 3);
+    this.buildHouse(172, 343, 4);
+    this.buildHouse(353, 376, 9);
+    this.buildHouse(494, 376, 8);
+    this.buildHouse(1130, 370, 10);
+    this.buildHouse(703, 342, 10);
+    this.buildHouse(785, 351, 9);
   }
 }
 
