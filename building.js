@@ -57,7 +57,8 @@ export class Building {
 
     if (flip) { ctx.translate(width, 0); ctx.scale(-1, 1); }
     if (animating) {
-      ctx.translate(0, height - (height * value));
+      // x value during animation ensures it animates from the center, not the left side as it scales up
+      ctx.translate((1 - value) * (width / 2), height - (height * value));
       ctx.scale(value, value);
     }
 
