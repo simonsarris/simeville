@@ -1,6 +1,6 @@
 import bezier from './easing.js';
 
-const houseBez = bezier(0.00, 0.75, 0.29, 1.1);
+const houseBez = bezier(0.00, 0.75, 0.29, 1.2);
 
 const BuildTime = 1200;
 
