@@ -58,10 +58,10 @@ export class Building {
     if (flip) { ctx.translate(width, 0); ctx.scale(-1, 1); }
     if (animating) {
       // Starting from a fixed scale like 0.6 looks nicer than appearing from nowhere.
-      const scale = 0.8 + (value * 0.2);
+      // const scale = 0.8 + (value * 0.2);
       // if scaling: this x value during animation ensures it animates from the center, not the left side as it scales up
-      ctx.translate((1 - scale) * (width / 2), (height - (height * value)));
-      ctx.scale(scale, scale);
+      ctx.translate(/* (1 - scale) * (width / 2) */ 0, (height - (height * value)));
+      // ctx.scale(scale, scale);
     }
 
 
