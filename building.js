@@ -1,6 +1,6 @@
 import bezier from './easing.js';
 
-const houseBez = bezier(0.00, 0.75, 0.29, 1.4);
+const houseBez = bezier(0.00, 0.75, 0.29, 1.1);
 
 const BuildTime = 1200;
 
@@ -57,9 +57,11 @@ export class Building {
 
     if (flip) { ctx.translate(width, 0); ctx.scale(-1, 1); }
     if (animating) {
-      // x value during animation ensures it animates from the center, not the left side as it scales up
-      ctx.translate((1 - value) * (width / 2), height - (height * value));
-      ctx.scale(value, value);
+      // Starting from a fixed scale like 0.6 looks nicer than appearing from nowhere.
+      const scale = 0.6 + (value * 0.4);
+      // if scaling: this x value during animation ensures it animates from the center, not the left side as it scales up
+      ctx.translate((scale - value) * (width / 2), (height - (height * value)));
+      ctx.scale(scale, scale);
     }
 
 
