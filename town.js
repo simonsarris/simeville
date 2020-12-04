@@ -1,6 +1,6 @@
+/* eslint-disable radix */
 
 import { Building } from './building.js';
-import { randomInt, random } from './util.js';
 
 const SceneWidth = 1600;
 const SceneHeight = 880;
@@ -22,16 +22,15 @@ for (let i = 0; i < BuildingCount; i++) {
 
 export class Town {
   constructor(canvas, skyCanvas) {
-    // eslint-disable-next-line no-param-reassign
-    canvas.onselectstart = function () { return false; };
     const arr = [];
     this.buildings = arr;
     this.ctx = canvas.getContext('2d');
     this.canvas = canvas;
     this.selection = null;
-    this.mode = 'build'; // or 'select' or 'drag'
     this.x = 0;
     this.y = 0;
+
+    this.totalTimeout = 0;
 
     // dragging. draggedObject doubles as state, null = no drag ongoing
     this.draggedObject = null;
@@ -39,6 +38,9 @@ export class Town {
     this.dragStartY = 0;
     this.dragStartObjectX = 0;
     this.dragStartObjectY = 0;
+
+    // debug, building by hand
+    this.currentBuildingIndex = 0; // Index of the array of buildings that click-building will build
 
     // sky, sun, foreground
     this.skyCtx = skyCanvas.getContext('2d');
@@ -48,7 +50,7 @@ export class Town {
     this.sky = { x: 0, y: 0, width: SceneWidth, height: 400, img: skyImage };
     const sunImage = new Image();
     sunImage.src = 'images/sun.png';
-    this.sun = { x: 950, y: 50, width: 150, height: 150, img: sunImage };
+    this.sun = { x: 1050, y: 50, width: 150, height: 150, img: sunImage };
     const moonImage = new Image();
     moonImage.src = 'images/moon.png';
     this.moon = { x: 350, y: 600, width: 75, height: 75, img: moonImage };
@@ -82,14 +84,38 @@ export class Town {
     this.lastBuiltIndex = 0;
 
 
+    // For debug purposes (and later optimization?) make a single array of each building
+    this.allBuildings = [];
+    const l = this.buildingsImages.length;
+    let x = 50;
+    const y = 750;
+    for (let i = 0; i < l; i++) {
+      const building = this.buildingsImages[i];
+      // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
+      const { w } = building;
+      const { h } = building;
+      // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
+      this.allBuildings.push(
+        new Building(x, y, w / 2, h / 2, false,
+          this.buildingsImage, building.x, building.y, building.w, building.h)
+      );
+      x += w / 2;
+    }
+
+
+
     const self = this;
     canvas.addEventListener('mousedown', function (e) {
-      // if (self.mode !== 'drag') return;
+      if (e.button !== 0) return; // only left click drags for now
       self.setCoords(e);
+      // eslint-disable-next-line no-shadow
       const { x, y } = self;
-      // ehh
-      if (self.containsObject(x, y, self.sun)) self.draggedObject = self.sun;
-      if (self.containsObject(x, y, self.moon)) self.draggedObject = self.moon;
+      // ehh this could generalize better
+      if (self.containsObject(x, y, self.sun)) { self.draggedObject = self.sun; } else if (self.containsObject(x, y, self.moon)) { self.draggedObject = self.moon; } else { // look for buildings
+        if (e.button === 0) self.selectHouse(x, y);
+        const obj = self.findObjectAt(x, y);
+        self.draggedObject = obj;
+      }
 
       if (self.draggedObject !== null) {
         self.dragStartX = x;
@@ -100,9 +126,9 @@ export class Town {
     });
 
     canvas.addEventListener('mousemove', function (e) {
-      // if (self.mode !== 'drag') return;
       if (self.draggedObject === null) return;
       self.setCoords(e);
+      // eslint-disable-next-line no-shadow
       const { x, y } = self;
       self.draggedObject.x = self.dragStartObjectX - (self.dragStartX - x);
       self.draggedObject.y = self.dragStartObjectY - (self.dragStartY - y);
@@ -116,15 +142,34 @@ export class Town {
     canvas.addEventListener('mouseup', function (e) {
       if (self.draggedObject !== null) {
         self.draggedObject = null;
-        return;
+        self.draw();
       }
       self.setCoords(e);
+      // eslint-disable-next-line no-shadow
       const { x, y } = self;
-      console.log(x, y);
-      if (self.mode === 'build') self.buildHouse(x, y);
-      else if (self.mode === 'select') self.selectHouse(x, y);
+      if (e.button === 2) self.buildHouse(x | 0, y | 0, self.currentBuildingIndex);
     });
 
+    canvas.addEventListener('keydown', function(e) {
+      e.preventDefault();
+      if (e.key === 'Delete' && self.selection !== null) {
+        self.buildings.splice(self.buildings.indexOf(self.selection), 1);
+        self.selection = null;
+        self.draw();
+      } else if (e.key.match('[1-9]') !== null) {
+        self.currentBuildingIndex = parseInt(e.key);
+      } else if (e.key === 'ArrowRight') {
+        self.currentBuildingIndex++;
+      } else if (e.key === 'ArrowLeft') {
+        self.currentBuildingIndex--;
+      } else if (e.key === 'ArrowUp') { // are you regetting that this isn't a switch statement yet?
+        self.moveSelectionZ(true);
+      } else if (e.key === 'ArrowDown') {
+        self.moveSelectionZ(false);
+      }
+    });
+    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    canvas.addEventListener('selectstart', function (e) { e.preventDefault(); });
     this.update();
   }
 
@@ -137,25 +182,44 @@ export class Town {
     this.y = (e.clientY - box.top) * (can.height / box.height);
   }
 
-  buildHouse(x, y, optionalBuildingIndex) {
-    console.log(x, y);
-    let w = 80;
-    let h = 90;
-    const flip = false; // Math.random() > 0.5;
+  buildHouse(x, y, buildingIndex) {
+    // Lazy way of building in the right order right now is to delay
+    // the houses starting with the *most* delay for the last houses
+    // Since the z-order of building is approx reverse the building order
+    // I should fix this maybe by stuffing them in another array or something
+    const timeout = this.totalTimeout;
+    this.totalTimeout -= 105; // corresponds to bullshit magic number in load
+    if (this.totalTimeout < 0) this.totalTimeout = 0; // blah this is because I'm only approximating the total delay needed and counting downwards
+    const self = this;
+    const flip = false; // make optional param
     // use a sprite map of buildings
-    const building = this.buildingsImages[optionalBuildingIndex || this.lastBuiltIndex];
+    const building = self.buildingsImages[buildingIndex];
     // This is one place we could apply scale to images, but it may be better to ctx.scale instead.
-    w = building.w;
-    h = building.h;
+    const { w, h } = building;
     // w / 2 = Half the image size. Lazy way of adding pixel resolution! Do elsewhere?
-    const newbuilding = new Building(x - (building.w/2), y - building.h, w, h, flip, this.buildingsImage, building.x, building.y, building.w, building.h);
-    this.buildings.push(newbuilding);
-    this.buildings.sort((a, b) => ((a.y + a.height >= b.y + b.height) ? 1 : -1));
-    newbuilding.build();
-    if (optionalBuildingIndex === undefined) {
-      this.lastBuiltIndex++;
-      if (this.lastBuiltIndex >= this.buildingsImages.length) this.lastBuiltIndex = 0;
+    const newbuilding = new Building(
+      x, y, w / 2, h / 2, flip, self.buildingsImage,
+      building.x, building.y, w, h, timeout
+    );
+    self.buildings.push(newbuilding);
+    newbuilding.build(); // should this just happen automatically?
+  }
+
+
+  // true if moving to front, false if back
+  // only called when selection non-null
+  moveSelectionZ(up) {
+    const { selection, buildings } = this;
+    if (selection === null) return;
+    const fromIndex = buildings.indexOf(selection);
+    console.log(`selection was at index${fromIndex}`);
+    // no changes if its already at the bounds of the array
+    if ((up && fromIndex === buildings.length - 1) || (!up && fromIndex === 0)) {
+      return;
     }
+    buildings.splice(fromIndex, 1);
+    buildings.splice(fromIndex + (up ? 1 : -1), 0, selection);
+    console.log(`selection is at index${buildings.indexOf(selection)}`);
   }
 
   selectHouse(x, y) {
@@ -176,7 +240,7 @@ export class Town {
 
   draw() {
     const {
-      buildings, ctx, canvas, selection, skylineY, sky, sun, moon, stars, foreground, skyCtx
+      buildings, ctx, canvas, selection, skylineY, sky, sun, moon, stars, foreground, skyCtx, allBuildings, currentBuildingIndex
     } = this; // wow. much destructure.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = false; // could set this once in constructor if it will never get reset
@@ -211,7 +275,7 @@ export class Town {
     skyCtx.globalAlpha = 1;
 
     // Buildings
-    const l = buildings.length;
+    let l = buildings.length;
     for (let i = 0; i < l; i++) {
       buildings[i].draw(ctx);
     }
@@ -226,9 +290,25 @@ export class Town {
     ctx.globalCompositeOperation = 'source-over';
 
     if (selection) {
-      ctx.strokeStyle = 'lime';
-      ctx.strokeRect(selection.x, selection.y, selection.width, selection.height);
-      ctx.strokeStyle = 'black';
+      ctx.strokeStyle = 'magenta';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(selection.x, selection.y - (selection.height), selection.width, selection.height);
+    }
+
+    if (window.debug) {
+      // paint all the buildings below so we can select one etc
+      l = allBuildings.length;
+      ctx.font = '26px sans serif';
+      for (let i = 0; i < l; i++) {
+        const b = allBuildings[i];
+        b.draw(ctx);
+        ctx.fillStyle = currentBuildingIndex === i ? 'lime' : 'red';
+        ctx.fillRect(b.x, b.y, 25, 25);
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'white';
+        ctx.strokeText(i, b.x, b.y + 20);
+        ctx.fillText(i, b.x, b.y + 20);
+      }
     }
   }
 
@@ -243,39 +323,119 @@ export class Town {
   }
 
   // ?? this duplicates code found in building, maybe make an entity class?
+  // big different right now in that this is used for sun and moon which have
+  // x/y coord === top left, not bottom left
   containsObject(x, y, obj) {
     return ((obj.x <= x) && ((obj.x + obj.width) >= x) &&
       (obj.y <= y) && ((obj.y + obj.height) >= y));
   }
 
 
-  // Create a bunch of buildings and animate them in sequence
-  ITS_TIME_TO_BUILD() {
-    // it's time to randomize the building order:
-    for(let i = TownBuildings.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * i)
-      const temp = TownBuildings[i]
-      TownBuildings[i] = TownBuildings[j]
-      TownBuildings[j] = temp
-    }
-    const smallHouses = [0, 4, 8, 9, 10];
+  // // Create a bunch of buildings and animate them in sequence
+  // ITS_TIME_TO_BUILD() {
+  //   // it's time to randomize the building order:
+  //   for (let i = TownBuildings.length - 1; i > 0; i--) {
+  //     const j = Math.floor(Math.random() * i);
+  //     const temp = TownBuildings[i];
+  //     TownBuildings[i] = TownBuildings[j];
+  //     TownBuildings[j] = temp;
+  //   }
+  //   const smallHouses = [0, 4, 8, 9, 10];
 
-    for (var i = 0; i < TownBuildings.length; i ++) {
-      const building = TownBuildings[i];
-      const self = this;
-      let heightAdjustment = i / 2;
-      setTimeout(function() {
-        if (Math.random() < 0.8) {
-          var buildingType = smallHouses[Math.floor(Math.random() * smallHouses.length)];
-          self.buildHouse(building.x, building.y - heightAdjustment, buildingType);
-        } else {
-          self.buildHouse(building.x, building.y - heightAdjustment);
-        }
-      }, i*25);
+  //   for (let i = 0; i < TownBuildings.length; i++) {
+  //     const building = TownBuildings[i];
+  //     const self = this;
+  //     const heightAdjustment = i / 2;
+  //     setTimeout(function() {
+  //       if (Math.random() < 0.8) {
+  //         const buildingType = smallHouses[Math.floor(Math.random() * smallHouses.length)];
+  //         self.buildHouse(building.x, building.y - heightAdjustment, buildingType);
+  //       } else {
+  //         self.buildHouse(building.x, building.y - heightAdjustment);
+  //       }
+  //     }, i * 25);
+  //   }
+  // }
+
+  saveBuildings() {
+    const l = this.buildings.length;
+    for (let i = 0; i < l; i++) {
+      console.log(this.buildings[i].toString());
     }
-    
   }
 
+  loadBuildings() {
+    this.totalTimeout = 70 * 105;
+    this.buildHouse(509, 328, 4);
+    this.buildHouse(630, 291, 1);
+    this.buildHouse(1, 364, 15);
+    this.buildHouse(1446, 364, 11);
+    this.buildHouse(47, 348, 4);
+    this.buildHouse(1079, 364, 7);
+    this.buildHouse(922, 327, 12);
+    this.buildHouse(1314, 321, 13);
+    this.buildHouse(465, 336, 6);
+    this.buildHouse(319, 324, 5);
+    this.buildHouse(366, 316, 8);
+    this.buildHouse(287, 301, 10);
+    this.buildHouse(339, 325, 10);
+    this.buildHouse(299, 324, 10);
+    this.buildHouse(378, 338, 10);
+    this.buildHouse(325, 375, 15);
+    this.buildHouse(469, 356, 11);
+    this.buildHouse(613, 305, 10);
+    this.buildHouse(761, 315, 10);
+    this.buildHouse(700, 259, 3);
+    this.buildHouse(690, 319, 8);
+    this.buildHouse(813, 334, 2);
+    this.buildHouse(794, 324, 0);
+    this.buildHouse(634, 326, 4);
+    this.buildHouse(678, 331, 10);
+    this.buildHouse(736, 364, 15);
+    this.buildHouse(1372, 338, 2);
+    this.buildHouse(1180, 346, 1);
+    this.buildHouse(1406, 366, 3);
+    this.buildHouse(835, 331, 0);
+    this.buildHouse(337, 364, 9);
+    this.buildHouse(863, 330, 10);
+    this.buildHouse(1126, 348, 4);
+    this.buildHouse(1005, 320, 8);
+    this.buildHouse(940, 328, 11);
+    this.buildHouse(962, 320, 10);
+    this.buildHouse(1041, 347, 10);
+    this.buildHouse(1039, 357, 10);
+    this.buildHouse(988, 329, 9);
+    this.buildHouse(113, 327, 14);
+    this.buildHouse(551, 356, 7);
+    this.buildHouse(601, 372, 15);
+    this.buildHouse(561, 361, 9);
+    this.buildHouse(613, 371, 9);
+    this.buildHouse(1234, 327, 6);
+    this.buildHouse(430, 365, 1);
+    this.buildHouse(412, 370, 4);
+    this.buildHouse(93, 341, 9);
+    this.buildHouse(61, 355, 9);
+    this.buildHouse(115, 343, 9);
+    this.buildHouse(204, 325, 2);
+    this.buildHouse(385, 385, 0);
+    this.buildHouse(230, 363, 7);
+    this.buildHouse(261, 370, 4);
+    this.buildHouse(1222, 319, 10);
+    this.buildHouse(1299, 305, 10);
+    this.buildHouse(1253, 325, 10);
+    this.buildHouse(1273, 339, 10);
+    this.buildHouse(1194, 351, 10);
+    this.buildHouse(1303, 353, 15);
+    this.buildHouse(1091, 359, 14);
+    this.buildHouse(902, 353, 1);
+    this.buildHouse(152, 341, 3);
+    this.buildHouse(172, 343, 4);
+    this.buildHouse(353, 376, 9);
+    this.buildHouse(494, 376, 8);
+    this.buildHouse(1130, 370, 10);
+    this.buildHouse(703, 342, 10);
+    this.buildHouse(785, 351, 9);
+  }
 }
 
 
