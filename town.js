@@ -78,7 +78,7 @@ export class Town {
       { x: 1552, y: 438, w: 110, h: 160 },
       { x: 1748, y: 0, w: 290, h: 593 }, // cathedral
       { x: 2108, y: 262, w: 60, h: 332 },
-      { x: 2335, y: 290, w: 113, h: 298 },
+      { x: 2335, y: 310, w: 113, h: 318 },
       { x: 2474, y: 431, w: 188, h: 167 },
     ];
     this.lastBuiltIndex = 0;
@@ -405,7 +405,7 @@ export class Town {
     this.buildHouse(1041, 347, 10);
     this.buildHouse(1039, 357, 10);
     this.buildHouse(988, 329, 9);
-    this.buildHouse(113, 327, 14);
+    this.buildHouse(113, 397, 14);
     this.buildHouse(551, 356, 7);
     this.buildHouse(601, 372, 15);
     this.buildHouse(561, 361, 9);
@@ -426,7 +426,7 @@ export class Town {
     this.buildHouse(1273, 339, 10);
     this.buildHouse(1194, 351, 10);
     this.buildHouse(1303, 353, 15);
-    this.buildHouse(1091, 359, 14);
+    this.buildHouse(1091, 379, 14);
     this.buildHouse(902, 353, 1);
     this.buildHouse(152, 341, 3);
     this.buildHouse(172, 343, 4);
