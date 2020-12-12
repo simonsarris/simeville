@@ -188,7 +188,15 @@ export class Town {
     // Since the z-order of building is approx reverse the building order
     // I should fix this maybe by stuffing them in another array or something
     const timeout = this.totalTimeout;
-    this.totalTimeout -= 105; // corresponds to bullshit magic number in load
+    const builtSoFar = this.buildings.length;
+    if (builtSoFar < 18) {
+      this.totalTimeout += 80;
+    } else {
+      this.totalTimeout += Math.max(50 - (builtSoFar / 2), 10);
+    }
+    // dramatic pauses at 18 and 35 buildings
+    if (builtSoFar === 18) this.totalTimeout += 700;
+    if (builtSoFar === 35) this.totalTimeout += 700;
     if (this.totalTimeout < 0) this.totalTimeout = 0; // blah this is because I'm only approximating the total delay needed and counting downwards
     const self = this;
     const flip = false; // make optional param
@@ -201,7 +209,8 @@ export class Town {
       x, y, w / 2, h / 2, flip, self.buildingsImage,
       building.x, building.y, w, h, timeout
     );
-    self.buildings.push(newbuilding);
+    console.log(timeout, buildingIndex);
+    self.buildings.unshift(newbuilding); // we build this array from the back to the front since we add delay as we go
     newbuilding.build(); // should this just happen automatically?
   }
 
@@ -330,33 +339,6 @@ export class Town {
       (obj.y <= y) && ((obj.y + obj.height) >= y));
   }
 
-
-  // // Create a bunch of buildings and animate them in sequence
-  // ITS_TIME_TO_BUILD() {
-  //   // it's time to randomize the building order:
-  //   for (let i = TownBuildings.length - 1; i > 0; i--) {
-  //     const j = Math.floor(Math.random() * i);
-  //     const temp = TownBuildings[i];
-  //     TownBuildings[i] = TownBuildings[j];
-  //     TownBuildings[j] = temp;
-  //   }
-  //   const smallHouses = [0, 4, 8, 9, 10];
-
-  //   for (let i = 0; i < TownBuildings.length; i++) {
-  //     const building = TownBuildings[i];
-  //     const self = this;
-  //     const heightAdjustment = i / 2;
-  //     setTimeout(function() {
-  //       if (Math.random() < 0.8) {
-  //         const buildingType = smallHouses[Math.floor(Math.random() * smallHouses.length)];
-  //         self.buildHouse(building.x, building.y - heightAdjustment, buildingType);
-  //       } else {
-  //         self.buildHouse(building.x, building.y - heightAdjustment);
-  //       }
-  //     }, i * 25);
-  //   }
-  // }
-
   saveBuildings() {
     const l = this.buildings.length;
     for (let i = 0; i < l; i++) {
@@ -365,76 +347,76 @@ export class Town {
   }
 
   loadBuildings() {
-    this.totalTimeout = 70 * 105;
-    this.buildHouse(509, 328, 4);
-    this.buildHouse(630, 291, 1);
-    this.buildHouse(1, 364, 15);
-    this.buildHouse(1446, 364, 11);
-    this.buildHouse(47, 348, 4);
-    this.buildHouse(1079, 364, 7);
-    this.buildHouse(922, 327, 12);
-    this.buildHouse(1314, 321, 13);
-    this.buildHouse(465, 336, 6);
-    this.buildHouse(319, 324, 5);
-    this.buildHouse(366, 316, 8);
-    this.buildHouse(287, 301, 10);
-    this.buildHouse(339, 325, 10);
-    this.buildHouse(299, 324, 10);
-    this.buildHouse(378, 338, 10);
-    this.buildHouse(325, 375, 15);
-    this.buildHouse(469, 356, 11);
-    this.buildHouse(613, 305, 10);
-    this.buildHouse(761, 315, 10);
-    this.buildHouse(700, 259, 3);
-    this.buildHouse(690, 319, 8);
-    this.buildHouse(813, 334, 2);
-    this.buildHouse(794, 324, 0);
-    this.buildHouse(634, 326, 4);
-    this.buildHouse(678, 331, 10);
-    this.buildHouse(736, 364, 15);
-    this.buildHouse(1372, 338, 2);
-    this.buildHouse(1180, 346, 1);
-    this.buildHouse(1406, 366, 3);
-    this.buildHouse(835, 331, 0);
-    this.buildHouse(337, 364, 9);
-    this.buildHouse(863, 330, 10);
-    this.buildHouse(1126, 348, 4);
-    this.buildHouse(1005, 320, 8);
-    this.buildHouse(940, 328, 11);
-    this.buildHouse(962, 320, 10);
-    this.buildHouse(1041, 347, 10);
-    this.buildHouse(1039, 357, 10);
-    this.buildHouse(988, 329, 9);
-    this.buildHouse(113, 397, 14);
-    this.buildHouse(551, 356, 7);
-    this.buildHouse(601, 372, 15);
-    this.buildHouse(561, 361, 9);
-    this.buildHouse(613, 371, 9);
-    this.buildHouse(1234, 327, 6);
-    this.buildHouse(430, 365, 1);
-    this.buildHouse(412, 370, 4);
-    this.buildHouse(93, 341, 9);
-    this.buildHouse(61, 355, 9);
-    this.buildHouse(115, 343, 9);
-    this.buildHouse(204, 325, 2);
-    this.buildHouse(385, 385, 0);
-    this.buildHouse(230, 363, 7);
-    this.buildHouse(261, 370, 4);
-    this.buildHouse(1222, 319, 10);
-    this.buildHouse(1299, 305, 10);
-    this.buildHouse(1253, 325, 10);
-    this.buildHouse(1273, 339, 10);
-    this.buildHouse(1194, 351, 10);
-    this.buildHouse(1303, 353, 15);
-    this.buildHouse(1091, 379, 14);
-    this.buildHouse(902, 353, 1);
-    this.buildHouse(152, 341, 3);
-    this.buildHouse(172, 343, 4);
-    this.buildHouse(353, 376, 9);
-    this.buildHouse(494, 376, 8);
-    this.buildHouse(1130, 370, 10);
-    this.buildHouse(703, 342, 10);
+    this.totalTimeout = 0; // no starting delay?
     this.buildHouse(785, 351, 9);
+    this.buildHouse(703, 342, 10);
+    this.buildHouse(1130, 370, 10);
+    this.buildHouse(494, 376, 8);
+    this.buildHouse(353, 376, 9);
+    this.buildHouse(172, 343, 4);
+    this.buildHouse(152, 341, 3);
+    this.buildHouse(902, 353, 1);
+    this.buildHouse(1091, 379, 14);
+    this.buildHouse(1303, 353, 15);
+    this.buildHouse(1194, 351, 10);
+    this.buildHouse(1273, 339, 10);
+    this.buildHouse(1253, 325, 10);
+    this.buildHouse(1299, 305, 10);
+    this.buildHouse(1222, 319, 10);
+    this.buildHouse(261, 370, 4);
+    this.buildHouse(230, 363, 7);
+    this.buildHouse(385, 385, 0);
+    this.buildHouse(204, 325, 2);
+    this.buildHouse(115, 343, 9);
+    this.buildHouse(61, 355, 9);
+    this.buildHouse(93, 341, 9);
+    this.buildHouse(412, 370, 4);
+    this.buildHouse(430, 365, 1);
+    this.buildHouse(1234, 327, 6);
+    this.buildHouse(613, 371, 9);
+    this.buildHouse(561, 361, 9);
+    this.buildHouse(601, 372, 15);
+    this.buildHouse(551, 356, 7);
+    this.buildHouse(113, 397, 14);
+    this.buildHouse(988, 329, 9);
+    this.buildHouse(1039, 357, 10);
+    this.buildHouse(1041, 347, 10);
+    this.buildHouse(962, 320, 10);
+    this.buildHouse(940, 328, 11);
+    this.buildHouse(1005, 320, 8);
+    this.buildHouse(1126, 348, 4);
+    this.buildHouse(863, 330, 10);
+    this.buildHouse(337, 364, 9);
+    this.buildHouse(835, 331, 0);
+    this.buildHouse(1406, 366, 3);
+    this.buildHouse(1180, 346, 1);
+    this.buildHouse(1372, 338, 2);
+    this.buildHouse(736, 364, 15);
+    this.buildHouse(678, 331, 10);
+    this.buildHouse(634, 326, 4);
+    this.buildHouse(794, 324, 0);
+    this.buildHouse(813, 334, 2);
+    this.buildHouse(690, 319, 8);
+    this.buildHouse(700, 259, 3);
+    this.buildHouse(761, 315, 10);
+    this.buildHouse(613, 305, 10);
+    this.buildHouse(469, 356, 11);
+    this.buildHouse(325, 375, 15);
+    this.buildHouse(378, 338, 10);
+    this.buildHouse(299, 324, 10);
+    this.buildHouse(339, 325, 10);
+    this.buildHouse(287, 301, 10);
+    this.buildHouse(366, 316, 8);
+    this.buildHouse(319, 324, 5);
+    this.buildHouse(465, 336, 6);
+    this.buildHouse(1314, 321, 13);
+    this.buildHouse(922, 327, 12);
+    this.buildHouse(1079, 364, 7);
+    this.buildHouse(47, 348, 4);
+    this.buildHouse(1446, 364, 11);
+    this.buildHouse(1, 364, 15);
+    this.buildHouse(630, 291, 1);
+    this.buildHouse(509, 328, 4);
   }
 }
 
